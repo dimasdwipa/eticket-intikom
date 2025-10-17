@@ -10,6 +10,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\MailController;
 
+
 class ActionSendAssignment extends Command
 {
     /**
@@ -45,7 +46,8 @@ class ActionSendAssignment extends Command
     {
        
         $tickets = Ticket::where('status', 'Open')
-            ->whereRaw('DATE_ADD(tickets.created_at , interval tickets.send_assignment_default MINUTE) < now()')
+            // ->whereRaw('DATE_ADD(tickets.created_at , interval tickets.send_assignment_default MINUTE) < now()')
+            ->whereRaw('DATEADD(MINUTE, tickets.send_assignment_default, tickets.created_at) < GETDATE()')
             ->whereNull('sla_assignment')
             ->where('tickets.send_assignment_default','>',0)
             ->whereNull('sub_kategoris.agent_id')

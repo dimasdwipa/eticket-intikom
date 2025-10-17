@@ -63,7 +63,7 @@
                             <h4 class="mb-0">{{  $tickets_icon->where('status','Document Revison')->count() }}</h4>
                         </div>
                     </div>
-                    
+
                     {{-- <hr class="dark horizontal my-0">
                     <div class="card-footer p-3">
                         <p class="mb-0"><span class="text-danger text-sm font-weight-bolder">-2%</span> than yesterday</p>
@@ -87,7 +87,7 @@
                 </div>
             </a>
         </div>
-       
+
         <div class="col-xl-3 col-sm-6 mb-xl-0 pb-5 mb-4">
             <a href="{{ url('sa/agent?status=Re Prosess') }}">
                 <div class="card card-select">
@@ -152,11 +152,11 @@
                 </div>
             </a>
         </div>
-       
-        
-        
-   
-        
+
+
+
+
+
         <div class="col-xl-3 col-sm-6 mb-xl-0 pb-5 mb-4">
             <a href="{{ url('sa/agent?status=Overdue') }}">
                 <div class="card card-select">
@@ -198,7 +198,7 @@
                 </div>
             </a>
         </div>
-       
+
     </div>
     <div class="container-fluid py-4">
         <div class="row">
@@ -224,7 +224,7 @@
                                         <th
                                             class="text-uppercase text-secondary text-xs font-weight-bolder text-center  ps-3">
                                             Created</th>
-                                       
+
                                         <th class="text-uppercase text-secondary text-xs font-weight-bolder  ps-3">
                                             Category
                                         </th>
@@ -250,12 +250,12 @@
                                                 #{{ $item->code }}
                                             </td>
                                             <td>{{ date_format(date_create($item->created_at), 'd-M-y') }}</td>
-                                            
+
                                             <td>{{ $item->sub_katagori->sub_kategori ?? '' }}</td>
                                             <td>{{ $item->customer }}</td>
                                             <td>{{ $item->no_CRM }}</td>
                                             <td>{{ $item->bu }}</td>
-                                         
+
                                             <td>
                                                 @if($item->status=='Resolved')
                                                 Finish

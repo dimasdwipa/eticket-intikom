@@ -13,12 +13,14 @@ use Haruncpi\LaravelUserActivity\Traits\Loggable;
 use Mpociot\Teamwork\Traits\UserHasTeams;
 
 
+
 class User extends Authenticatable implements LdapAuthenticatable
 {
     use Notifiable, AuthenticatesWithLdap;
     use UserHasTeams;
     use Loggable;
     use Notifiable;
+    use HasFactory;
 
     /**
      * The attributes that are mass assignable.

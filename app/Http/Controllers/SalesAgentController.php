@@ -46,8 +46,8 @@ class SalesAgentController extends Controller
 
     public function index()
     {
-        
-        $tickets_icon=Ticket::whereBetween('created_at',[Carbon::now()->subYear(), Carbon::now()])
+
+        $tickets_icon=Ticket::whereBetween('created_at',[ Carbon::now()->startOfYear(), Carbon::now()])
         ->where('agent_id',Auth::id())
         // ->when(!empty($_GET['status']),function($query){
         //     if($_GET['status']!='Overdue'){
@@ -60,12 +60,13 @@ class SalesAgentController extends Controller
         //  })
         ->orderby('created_at','desc')->get();
 
-        $tickets=Ticket::whereBetween('created_at',[Carbon::now()->subYear(), Carbon::now()])
+        $tickets=Ticket::whereBetween('created_at',[ Carbon::now()->startOfYear(), Carbon::now()])
         ->where('agent_id',Auth::id())
         ->when(!empty($_GET['status']),function($query){
             if($_GET['status']=='Overdue'){
                 return $query->where('status', 'On Progress')
-                ->whereRaw('DATE_ADD(sla_respone , interval sla_ticket_time MINUTE) < now()')
+                // ->whereRaw('DATE_ADD(sla_respone , interval sla_ticket_time MINUTE) < now()')
+                ->whereRaw('DATEADD(MINUTE, sla_ticket_time, sla_respone) < GETDATE()')
                 ->whereNotNull('sla_respone');
             }else{
                 return $query->where('status', $_GET['status']);
@@ -76,7 +77,7 @@ class SalesAgentController extends Controller
         })
         ->orderby('created_at','desc')->get();
 
-        
+
 
         return view('sales-tiket.agent.home')
         ->with('tickets_icon',$tickets_icon)
@@ -86,7 +87,7 @@ class SalesAgentController extends Controller
     public function assignment()
     {
         $hari_ini = date("Y-m-d");
-        $tgl_pertama = date('Y-m-t', strtotime(date("Y-m-d", strtotime($hari_ini)) . " - 365 day"));
+        $tgl_pertama = date('Y-01-01', strtotime($hari_ini));
         $tgl_terakhir = date('Y-m-t', strtotime($hari_ini));
 
         if(!empty($_GET['start_date'])){
@@ -121,16 +122,16 @@ class SalesAgentController extends Controller
 
     public function response(Request $request){
 
-    
+
         $validated = $request->validate([
             'id' => 'required',
             'status' => 'required|max:255',
             'comment' => 'required'
         ]);
 
-        
+
         DB::beginTransaction();
-        
+
         // try {
 
         $data = Ticket::find($request->id);
@@ -156,7 +157,7 @@ class SalesAgentController extends Controller
             if ($validator->fails()) {
                 return redirect()->back()->withErrors($validator);
             }
-            
+
             $data->status = "On Progress";
             $data->sla_revison_end = now();
             $data->start_work = $request->start_work;
@@ -197,15 +198,14 @@ class SalesAgentController extends Controller
                 return redirect()->back()->withErrors($validator);
             }
 
-            
+
             $data->status = "On Progress";
             $data->sla_pending_end = now();
             $data->start_work = $request->start_work;
             $data->end_work = $request->end_work;
 
         }elseif($request->status=="On Progress"){
-           
-            // dd($request);
+
             $validator = Validator::make([
                 'sla_respone' =>now(),
                 'start_work' => $request->start_work, // Provide a default value if not present
@@ -214,6 +214,7 @@ class SalesAgentController extends Controller
                 'start_work' => 'required|date|after:sla_respone',
                 'end_work' => 'required|date|after:start_work',
             ]);
+
 
             if ($validator->fails()) {
                 return redirect()->back()->withErrors($validator);
@@ -231,7 +232,7 @@ class SalesAgentController extends Controller
 
             $validator = Validator::make([
                 'start_work' =>$data->start_work,
-                'date_finish' => $request->date_finish, 
+                'date_finish' => $request->date_finish,
                 'doc_no' => $request->doc_no,
             ], [
                 'date_finish' => 'required|date|after_or_equal:start_work',
@@ -242,7 +243,7 @@ class SalesAgentController extends Controller
                 return redirect()->back()->withErrors($validator);
             }
 
-        
+
             $data->sla_resolved=now();
             $data->state="Responded";
             $data->solution=$request->comment;
@@ -251,12 +252,12 @@ class SalesAgentController extends Controller
             $data->date_finish = $request->date_finish;
             $data->doc_no = $request->doc_no;
         }
-        
- 
+
+
         $data->save();
-       
+
         if($request->status=="On Progress"){
-         
+
             $email=new SalesMailController();
             $email->actionticket($data->id,"response");
 
@@ -289,7 +290,7 @@ class SalesAgentController extends Controller
         }
         $data2->approve=null;
         $data2->save();
-       
+
 
         if($request->status=="End Pending"){
 
@@ -328,7 +329,7 @@ class SalesAgentController extends Controller
             'status' => 'required|max:255',
             'comment' => 'required'
         ]);
-     
+
         $data = new Complain();
         $data->ticket_id = $request->id;
         $data->agent_id = Auth::user()->id;
@@ -336,7 +337,7 @@ class SalesAgentController extends Controller
         $data->note = $request->note;
         $data->sla_request=$request->start_date??null;
         $data->sla_request_end=$request->end_date??null;
-        
+
         if ($request->status != "Request Close") {
             $data->close_request=$request->close_request??null;
             $data->approve = "aproved";
@@ -367,27 +368,36 @@ class SalesAgentController extends Controller
 
         $data2 = Ticket::find($request->id);
 
-            
+
         if ($data->status == "Document Revison") {
-            
+
             $data2->status = "Document Revison";
             $data2->sla_revison =$request->start_date;
             $data2->sla_revison_end =null;
             $data2->start_work = null;
             $data2->end_work = null;
-        } 
+        }
 
         if($data->status == "Reassign"){
-            $data2->status ='Awaiting Update';
+            $data2->req_status ='Reassign';
         }
-        
+
+        if($data->status == "Request Pending"){
+            $data2->req_status ='Request Pending';
+        }
+
+        if ($data->status == "Extend SLA") {
+            $data2->req_status ='Extend SLA';
+        }
+
+
+        if ($data->status == "Unable Respond") {
+            $data2->req_status ='Extend SLA';
+        }
 
         $data2->save();
-           
 
-        
 
-          
         $email=new SalesMailController();
        if($data->status == "Document Revison"){
             $email->actionticket($data->ticket_id,"DocRevison",$data->id);
@@ -397,7 +407,7 @@ class SalesAgentController extends Controller
        }else{
            $email->actionticket($data->ticket_id,"agent reuqest",$data->id);
        }
-      
+
         return back()->with('success',$request->status.' have been seen auto aprove with supervisor !');
     }
 
@@ -409,7 +419,7 @@ class SalesAgentController extends Controller
     public function create()
     {
         $hari_ini = date("Y-m-d");
-        $tgl_pertama = date('Y-m-t', strtotime(date("Y-m-d", strtotime($hari_ini)) . " - 365 day"));
+        $tgl_pertama = date('Y-01-01', strtotime($hari_ini));
         $tgl_terakhir = date('Y-m-t', strtotime($hari_ini));
 
         if (!empty($_GET['start_date'])) {
@@ -466,7 +476,7 @@ class SalesAgentController extends Controller
     public function complain()
     {
         $hari_ini = date("Y-m-d");
-        $tgl_pertama = date('Y-m-t', strtotime(date("Y-m-d", strtotime($hari_ini)) . " - 365 day"));
+        $tgl_pertama = date('Y-01-01', strtotime($hari_ini));
         $tgl_terakhir = date('Y-m-t', strtotime($hari_ini));
 
         if (!empty($_GET['start_date'])) {

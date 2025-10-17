@@ -51,7 +51,9 @@
                                             <td>{{$item->tickets->where('status','Awaiting Response')->count()}}</td>
                                             <td>{{$item->tickets->where('status','On Progress')->count()}}</td>
                                             <td>{{$item->tickets->where('status','Repairing')->count()}}</td>
-                                            <td>{{$item->tickets->where('status','Overdue')->count()}}</td>
+                                            <td>{{$item->tickets()->where('status','On Progress')
+                                                ->whereRaw('DATEADD(MINUTE, sla_ticket_time, sla_respone) < GETDATE()')->count()}}
+                                            </td>
                                             <td>{{$item->tickets->where('status','Resolved')->count()}}</td>
                                             <td>{{$item->tickets->where('status','Closed')->count()}}</td>
                                             <td>{{$item->tickets->where('status','Pending')->count()}}</td>

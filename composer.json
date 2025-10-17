@@ -17,6 +17,7 @@
         "laravel/tinker": "^2.5",
         "laravel/ui": "*",
         "livewire/livewire": "^2.12",
+        "maatwebsite/excel": "^3.1",
         "mckenziearts/laravel-notify": "^2.4",
         "mpociot/teamwork": "^6.1.2",
         "nesbot/carbon": "^2.66"

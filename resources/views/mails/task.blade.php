@@ -14,9 +14,10 @@
     </tr>
     <tr>
         <td>
-            <div style="text-align:left;padding-bottom:10px">{{ $body1 }}</div>
+            <div style="text-align:left;padding-bottom:10px">{{ $body1 }} ticket dari {{$data->user->name??''}}</div>
         </td>
     </tr>
+    
 </table>
 <table border="0" align="center" cellpadding="0" cellspacing="0" width="100%" style="width:100%;max-width:100%;color:#000000;">
     <tr>

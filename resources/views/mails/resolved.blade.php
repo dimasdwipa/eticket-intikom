@@ -22,6 +22,7 @@
     <tr>
         <td cellpadding="0" cellspacing="0"  style="border:solid 1px #000000;padding: 5px;color:#010f22;background: #D8D8D8;text-align: center;font-weight: bold">No Ticket</td>
         <td cellpadding="0" cellspacing="0" style="border:solid 1px #000000;padding: 5px;color:#010f22;background: #D8D8D8;text-align: center;font-weight: bold">Problem</td>
+        <td cellpadding="0" cellspacing="0" style="border:solid 1px #000000;padding: 5px;color:#010f22;background: #D8D8D8;text-align: center;font-weight: bold">Comment</td>
         <td cellpadding="0" cellspacing="0" style="border:solid 1px #000000;padding: 5px;color:#010f22;background: #D8D8D8;text-align: center;font-weight: bold">Status</td>
          {{-- <td cellpadding="0" cellspacing="0" style="border:solid 1px #000000;padding: 5px;color:#010f22;background: #D8D8D8;text-align: center;font-weight: bold">Complain</td> --}}
         <td cellpadding="0" cellspacing="0" style="border:solid 1px #000000;padding: 5px;color:#010f22;background: #D8D8D8;text-align: center;font-weight: bold">Action</td>
@@ -29,6 +30,7 @@
     <tr>
         <td cellpadding="0" cellspacing="0" style="border:solid 1px #000000;padding: 4px 10px;color:#000000">#{{$data->code??$data->ticket->code}}</td>
         <td cellpadding="0" cellspacing="0" style="border:solid 1px #000000;padding: 4px 10px;color:#000000">{{$data->problem??$data->ticket->problem}}</td>
+        <td cellpadding="0" cellspacing="0" style="border:solid 1px #000000;padding: 4px 10px;color:#000000">{{$data->complains->last()->comment??$data->ticket->complains->last()->comment}}</td>
         <td cellpadding="0" cellspacing="0" style="border:solid 1px #000000;padding: 4px 10px;color:#000000; text-align: center">{{$data->status??$data->ticket->status}}</td>
         {{-- <td cellpadding="0" cellspacing="0" style="border:solid 1px #000000;padding: 4px 10px;color:#000000; text-align: center"><a class="button" style="background: #43a047 !important" href="{{ url('compalin?start_date=&end_date=&filter_by=code&keyword='.$data->id) }}">Show</a></td> --}}
         <td cellpadding="0" cellspacing="0" style="border:solid 1px #000000;padding: 4px 10px;color:#000000; text-align: center"><a class="button" href="@if($data->status=="Awaiting Response") {{ url('my-ticket?start_date='.date_format($data->created_at,'Y-m-d').'&end_date=&filter_by=code&keyword='.($data->code??$data->ticket->code)) }} @else {{ url('summary-report?start_date=&end_date=&filter_by=code&keyword='.($data->code??$data->ticket->code)) }}@endif">Show</a></td>

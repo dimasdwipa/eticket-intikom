@@ -75,6 +75,11 @@ class Ticket extends Model
         return $this->belongsTo(User::class,'user_id');
     }
 
+    public function complains()
+    {
+        return $this->hasMany(Complain::class);
+    }
+
     // file
 
     public function file_manager(){

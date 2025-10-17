@@ -170,7 +170,7 @@
                         </div>
                         <div class="card-footer px-0" style="text-align: right">
                             <button type="button" class="add btn btn-sm btn-success text-white"><i class="fa fa-plus"
-                                    aria-hidden="true"></i> Add Prablem</button>
+                                    aria-hidden="true"></i> Add Problem</button>
                         </div>
 
 

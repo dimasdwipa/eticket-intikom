@@ -49,7 +49,7 @@ class AgentController extends Controller
 
 
 
-        $tickets_icon=Ticket::whereBetween('created_at',[Carbon::now()->subYear(), Carbon::now()])
+        $tickets_icon=Ticket::whereBetween('created_at',[Carbon::now()->startOfYear(), Carbon::now()])
         ->where('user_id',Auth::id())
         // ->when(!empty($_GET['status']),function($query){
         //     if($_GET['status']!='Overdue'){
@@ -62,12 +62,13 @@ class AgentController extends Controller
         //  })
         ->orderby('created_at','desc')->get();
 
-        $tickets=Ticket::whereBetween('created_at',[Carbon::now()->subYear(), Carbon::now()])
+        $tickets=Ticket::whereBetween('created_at',[Carbon::now()->startOfYear(), Carbon::now()])
         ->where('agent_id',Auth::id())
         ->when(!empty($_GET['status']),function($query){
             if($_GET['status']!='Overdue'){
                 return $query->where('status', 'On Progress')
-                ->whereRaw('DATE_ADD(sla_respone , interval sla_ticket_time MINUTE) < now()')
+                // ->whereRaw('DATE_ADD(sla_respone , interval sla_ticket_time MINUTE) < now()')
+                ->whereRaw('DATEADD(MINUTE, sla_ticket_time, sla_respone) < GETDATE()')
                 ->whereNotNull('sla_respone');
             }else{
                 return $query->where('status', $_GET['status']);
@@ -78,7 +79,7 @@ class AgentController extends Controller
         })
         ->orderby('created_at','desc')->get();
 
-        
+
 
         return view('agent.home')
         ->with('tickets_icon',$tickets_icon)
@@ -87,9 +88,9 @@ class AgentController extends Controller
 
     public function assignment()
     {
-      
+
         $hari_ini = date("Y-m-d");
-        $tgl_pertama = date('Y-m-t', strtotime(date("Y-m-d", strtotime($hari_ini)) . " - 365 day"));
+        $tgl_pertama =  date('Y-01-01', strtotime($hari_ini));
         $tgl_terakhir = date('Y-m-t', strtotime($hari_ini));
 
         if(!empty($_GET['start_date'])){
@@ -125,7 +126,7 @@ class AgentController extends Controller
     }
 
     public function response(Request $request){
-      
+
         $validated = $request->validate([
             'id' => 'required',
             'status' => 'required|max:255',
@@ -164,16 +165,6 @@ class AgentController extends Controller
         }
         $data->save();
 
-        if($request->status=="On Progress"){
-
-            $email=new MailController();
-            $email->actionticket($data->id,"response");
-
-        }elseif($request->status=="Resolved"){
-
-            $email=new MailController();
-            $email->actionticket($data->id,"resolved");
-        }
 
         $data2 = new Complain();
         $data2->ticket_id = $request->id;
@@ -192,6 +183,19 @@ class AgentController extends Controller
         }
         $data2->approve=null;
         $data2->save();
+
+
+        if($request->status=="On Progress"){
+
+            $email=new MailController();
+            $email->actionticket($data->id,"response");
+
+        }elseif($request->status=="Resolved"){
+
+            $email=new MailController();
+            $email->actionticket($data->id,"resolved");
+        }
+
         DB::commit();
 
         } catch (\Throwable $th) {
@@ -217,7 +221,7 @@ class AgentController extends Controller
             'status' => 'required|max:255',
             'comment' => 'required'
         ]);
-     
+
         $data2 = new Complain();
         $data2->ticket_id = $request->id;
         $data2->agent_id = Auth::user()->id;
@@ -234,10 +238,10 @@ class AgentController extends Controller
         $data2->status=$request->status;
         $data2->save();
 
-        // $email=new MailController();
-       
-        // $email->actionticket($data2->id,"agent reuqest");
-      
+        $email=new MailController();
+
+        $email->actionticket($data2->id,"agent reuqest");
+
         return back()->with('success',$request->status.' have been seen to supervisor !');
     }
 
@@ -249,7 +253,7 @@ class AgentController extends Controller
     public function create()
     {
         $hari_ini = date("Y-m-d");
-        $tgl_pertama = date('Y-m-t', strtotime(date("Y-m-d", strtotime($hari_ini)) . " - 365 day"));
+        $tgl_pertama = date('Y-01-01', strtotime($hari_ini));
         $tgl_terakhir = date('Y-m-t', strtotime($hari_ini));
 
         if (!empty($_GET['start_date'])) {
@@ -306,7 +310,7 @@ class AgentController extends Controller
     public function complain()
     {
         $hari_ini = date("Y-m-d");
-        $tgl_pertama = date('Y-m-t', strtotime(date("Y-m-d", strtotime($hari_ini)) . " - 365 day"));
+        $tgl_pertama = date('Y-01-01', strtotime($hari_ini));
         $tgl_terakhir = date('Y-m-t', strtotime($hari_ini));
 
         if (!empty($_GET['start_date'])) {

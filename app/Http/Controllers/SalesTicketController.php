@@ -31,16 +31,16 @@ class SalesTicketController extends Controller
     public function __construct()
     {
 
-       
+
         $this->middleware('auth');
-        
+
         $this->middleware(function ($request, $next) {
             if (auth()->guest() || ! auth()->user()->currentTeam) {
 
                 return redirect('teams');
 
             }
-           
+
 
             if (Auth::user()->role=="user"||Auth::user()->role=="administrator"||Auth::user()->role=="supervisor-agent-user"||Auth::user()->role=="supervisor-user"||Auth::user()->role=="agent-user"){
 
@@ -51,19 +51,12 @@ class SalesTicketController extends Controller
 
 
         });
-        
+
 
     }
     public function index()
     {
 
-        // if(!empty($_GET['start_date'])&&!empty($_GET['end_date'])){
-        //     $tickets=Ticket::whereBetween('created_at',[$_GET['start_date'],  $_GET['end_date']])->get();
-        // }else{
-
-            
-            
-          
             $tickets=Ticket::where('user_id',Auth::id())
             ->where('status','!=','Closed')
             ->where('status','!=','Canceled')
@@ -73,7 +66,8 @@ class SalesTicketController extends Controller
                     return $query->where('state', $_GET['status']);
                 }elseif($_GET['status']=='Overdue'){
                     return $query->where('status', 'On Progress')
-                    ->whereRaw('DATE_ADD(sla_respone , interval sla_ticket_time MINUTE) < now()')
+                    // ->whereRaw('DATE_ADD(sla_respone , interval sla_ticket_time MINUTE) < now()')
+                    ->whereRaw('DATEADD(MINUTE, sla_ticket_time, sla_respone) < GETDATE()')
                     ->whereNotNull('sla_respone');
                 }else{
                     return $query->where('status', $_GET['status']);
@@ -85,7 +79,7 @@ class SalesTicketController extends Controller
             ->orderby('created_at','desc')->get();
 
 
-            $tickets_icon=Ticket::whereBetween('created_at',[Carbon::now()->subYear(), Carbon::now()])
+            $tickets_icon=Ticket::whereBetween('created_at',[ Carbon::now()->startOfYear(), Carbon::now()])
             ->where('user_id',Auth::id())
             ->allTeams()
             // ->when(!empty($_GET['status']),function($query){
@@ -146,18 +140,25 @@ class SalesTicketController extends Controller
         });
 
         $block_add_ticket=Ticket::where('user_id',Auth::id())
-        ->where('status','closed')
-        ->wherenull('rating')
+        ->where('status','Resolved')
         ->first();
-      
+
         if(!empty($block_add_ticket)){
             return back()->with('error','Anda belum memberikan rating pada ticket #'.$block_add_ticket->code.', mohon memberikan rating terlebih dahulu ');
         }
 
-        $code=strtotime(now());
+            $team=Team::find($request->team_id);
+            if($team->year!=date('Y')){
+                $team->year=date('Y');
+                $team->number=1;
+                $team->save();
+            }else{
+                $team->number=$team->number+1;
+                $team->save();
+            }
 
-     
-           
+            $code = $team->code . date('Y') . sprintf('%05d', $team->number);
+
 
             $file_data=false;
             $sk=  SubKategori::AllTeams()->find($request->subkategori);
@@ -183,7 +184,7 @@ class SalesTicketController extends Controller
 
             $ticket_save->customer=$request->customer;
             $ticket_save->no_CRM=$request->no_CRM;
-            
+
             $ticket_save->sales_admin=$sa->name;
             $ticket_save->agent_id=$sa->id;
             $ticket_save->supervisor_id=$bu->su_user_id;
@@ -211,7 +212,7 @@ class SalesTicketController extends Controller
                 }
             }
 
-   
+
 
 
             $data = new Complain();
@@ -262,8 +263,8 @@ class SalesTicketController extends Controller
         })->get())
         ->with('base_unit',BaseUnit::orderby('created_at','desc')->AllTeams()->where('team_id',3)->get())
         ->with('subkategori',SubKategori::orderby('created_at','desc')->AllTeams()->where('team_id',3)->get());
-        
-      
+
+
     }
 
     /**
@@ -276,7 +277,7 @@ class SalesTicketController extends Controller
     public function update(Request $request)
     {
 
-     
+
         $validated = $request->validate([
             'subkategori' => 'required|integer',
             'tanggal' => 'required|date',
@@ -290,13 +291,13 @@ class SalesTicketController extends Controller
         $request->cc_mails = array_filter($request->cc_mails, function($value) {
             return $value !== null;
         });
-        
+
 
         $block_add_ticket=Ticket::where('user_id',Auth::id())
         ->where('status','closed')
         ->wherenull('rating')
         ->first();
-      
+
         if(!empty($block_add_ticket)){
             return back()->with('error','Anda belum memberikan rating pada ticket #'.$block_add_ticket->code.', mohon memberikan rating terlebih dahulu ');
         }
@@ -324,7 +325,7 @@ class SalesTicketController extends Controller
 
             $ticket_save->customer=$request->customer;
             $ticket_save->no_CRM=$request->no_CRM;
-            
+
             $ticket_save->sales_admin=$sa->name;
             $ticket_save->agent_id=$sa->id;
             $ticket_save->supervisor_id=$bu->su_user_id;
@@ -352,7 +353,7 @@ class SalesTicketController extends Controller
                 }
             }
 
-   
+
 
 
             $data = new Complain();
@@ -369,7 +370,7 @@ class SalesTicketController extends Controller
             $email->newticket($ticket_save->code,2);
 
         return redirect()->route('sa.sales.user')->with('success','Update Ticket #'.$ticket_save->code.' successfully.');
-   
+
     }
 
     /**
@@ -425,8 +426,8 @@ class SalesTicketController extends Controller
     }
 
     public function complain(Request $request){
-    
-        
+
+
         $validated = $request->validate([
             'comment' => 'required|min:4'
         ]);
@@ -437,6 +438,7 @@ class SalesTicketController extends Controller
             // ini merubah ke Panding
             $data->status = "Complain";
         }
+
         $data->state = "Request Feedback";
         $data->sla_resolved = null;
         $data->save();
@@ -453,6 +455,7 @@ class SalesTicketController extends Controller
         $data2->team_id = $data->team_id;
         $data2->save();
 
+
         $email=new SalesMailController();
         $email->actioncomplain($data,$data2->id);
 
@@ -466,7 +469,7 @@ class SalesTicketController extends Controller
             'comment' => 'required'
         ]);
 
-        
+
         $data = Ticket::allTeams()->find($request->id);
         $data->rating = $request->rating;
         $data->comment_requestor = $request->comment;
@@ -491,7 +494,7 @@ class SalesTicketController extends Controller
     public function report(Request $request){
 
         $hari_ini = date("Y-m-d");
-        $tgl_pertama = date('Y-m-t', strtotime(date("Y-m-d", strtotime($hari_ini)) . " - 365 day"));
+        $tgl_pertama = date('Y-01-01', strtotime($hari_ini));
         $tgl_terakhir = date('Y-m-t', strtotime($hari_ini));
 
         if(!empty($_GET['start_date'])){

@@ -1,4 +1,4 @@
-@extends('layouts.app', ['page' => 'Pending Request', 'pageSlug' => 'Pending Request', 'section' => 'Pending Request'])
+@extends('layouts.app', ['page' => 'Pending Request From Agent', 'pageSlug' => 'Pending Request From Agent', 'section' => 'Pending Request From Agent'])
 
 @section('content')
 <div class="container-fluid py-4">
@@ -8,7 +8,7 @@
             <div class="card my-4">
                 <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
                     <div class="bg-gradient-primary shadow-primary border-radius-lg pt-2 pb-1">
-                        <h6 class="text-white text-capitalize ps-3">Pending Request</h6>
+                        <h6 class="text-white text-capitalize ps-3">Pending Request From Agent</h6>
                     </div>
                 </div>
                 <div class="card-body px-0 pb-2">
@@ -18,6 +18,9 @@
                             <thead>
 
                                 <tr>
+                                    <th class="text-center text-uppercase text-secondary text-xs font-weight-bolder  ps-3">
+                                        Action
+                                    </th>
                                     <th>
                                         #Ticket
                                     </th>
@@ -133,16 +136,34 @@
                                         style="min-width: 10rem">
                                         Note
                                     </th>
-                                    <th class="text-center text-uppercase text-secondary text-xs font-weight-bolder  ps-3">
-                                        Action
-                                    </th>
+
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach ($tickets as $item)
 
                                 <tr>
+                                    <td class="text-center">
+                                        <div class="btn-group" role="group" aria-label="Button group">
+                                            @if ($item->approve=='await')
+                                                <form action="{{ route('supervisor.request-extend-update') }}" method="post">
+                                                    @csrf
+                                                    <input type="hidden" name="id" class="dataID" value="{{ $item->id }}">
+                                                    <input type="hidden" name="resolution" class="dataID" value="aproved">
+                                                    <button type="submit"  class="btn btn-sm btn-success m-0 p-1 " style="width: 5rem">Aproved</button>
+                                                </form>
+                                                <form action="{{ route('supervisor.request-extend-update') }}" method="post">
+                                                    @csrf
+                                                    <input type="hidden" name="id" class="dataID" value="{{ $item->id }}">
+                                                    <input type="hidden" name="resolution" class="dataID" value="rejected">
+                                                    <button type="submit" class="btn btn-sm btn-danger m-0 p-1" style="width: 5rem">Rejected</button>
+                                                </form>
+                                            @else
+                                                {{ $item->approve }}
+                                            @endif
 
+                                        </div>
+                                    </td>
 
                                     <td class="font-weight-bold">
                                         #{{ $item->ticket->code }}
@@ -243,27 +264,7 @@
                                                 data-problem="{{ $item->note }}">Detail</button>
 
                                     </td>
-                                    <td class="text-center">
-                                        <div class="btn-group" role="group" aria-label="Button group">
-                                            @if ($item->approve=='await')
-                                                <form action="{{ route('supervisor.request-extend-update') }}" method="post">
-                                                    @csrf
-                                                    <input type="hidden" name="id" class="dataID" value="{{ $item->id }}">
-                                                    <input type="hidden" name="resolution" class="dataID" value="aproved">
-                                                    <button type="submit"  class="btn btn-sm btn-success m-0 p-1 " style="width: 5rem">Aproved</button>
-                                                </form>
-                                                <form action="{{ route('supervisor.request-extend-update') }}" method="post">
-                                                    @csrf
-                                                    <input type="hidden" name="id" class="dataID" value="{{ $item->id }}">
-                                                    <input type="hidden" name="resolution" class="dataID" value="rejected">
-                                                    <button type="submit" class="btn btn-sm btn-danger m-0 p-1" style="width: 5rem">Rejected</button>
-                                                </form>
-                                            @else
-                                                {{ $item->approve }}
-                                            @endif
 
-                                        </div>
-                                    </td>
                                 </tr>
                                 @endforeach
                             </tbody>

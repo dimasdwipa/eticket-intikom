@@ -23,14 +23,14 @@
         <span class="nav-link-text ms-1">My Ticket</span>
       </a>
   </li>
-  <!-- <li class="nav-item">
+  <li class="nav-item">
     <a class="nav-link text-white {{ $page == 'Select Tenant' ? 'active bg-gradient-primary' : '' }}" href="{{ route('select.tenant') }}">
       <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
         <i class="material-icons opacity-10">domain_add</i>
       </div>
       <span class="nav-link-text ms-1">Select Tenant</span>
     </a>
-  </li> -->
+  </li>
   <li class="nav-item">
     <a class="nav-link text-white {{ $page == 'Profile' ? 'active bg-gradient-primary' : '' }}" href="{{ route('profile.create') }}">
       <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
@@ -67,11 +67,11 @@
         </a>
     </li>
     <li class="nav-item">
-        <a class="nav-link text-white {{ $page == 'My Request' ? 'active bg-gradient-primary' : '' }}" href="{{ route('sa.agent.create') }}">
+        <a class="nav-link text-white {{ $page == 'My Request To SPV' ? 'active bg-gradient-primary' : '' }}" href="{{ route('sa.agent.create') }}">
         <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
             <i class="material-icons opacity-10">work_history</i>
         </div>
-        <span class="nav-link-text ms-1">My Request</span>
+        <span class="nav-link-text ms-1">My Request To SPV</span>
         </a>
     </li>
     <li class="nav-item">
@@ -134,11 +134,11 @@
         </a>
     </li>
     <li class="nav-item">
-        <a class="nav-link text-white {{ $page == 'My Request' ? 'active bg-gradient-primary' : '' }}" href="{{ route('sa.agent.create') }}">
+        <a class="nav-link text-white {{ $page == 'My Request To SPV' ? 'active bg-gradient-primary' : '' }}" href="{{ route('sa.agent.create') }}">
         <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
             <i class="material-icons opacity-10">work_history</i>
         </div>
-        <span class="nav-link-text ms-1">My Request</span>
+        <span class="nav-link-text ms-1">My Request To SPV</span>
         </a>
     </li>
     <li class="nav-item">
@@ -161,7 +161,7 @@
         </a>
     </li>
 
-  
+
     <li class="nav-item">
         <a class="nav-link text-white {{ $page == 'My Task' ? 'active bg-gradient-primary' : '' }}" href="{{ route('sa.agent.myticket') }}">
         <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
@@ -171,11 +171,11 @@
         </a>
     </li>
     <li class="nav-item">
-    <a class="nav-link text-white {{ $page == 'Pending Request' ? 'active bg-gradient-primary' : '' }}" href="{{ route('sa.supervisor.request-extend') }}">
+    <a class="nav-link text-white {{ $page == 'Pending Request From Agent' ? 'active bg-gradient-primary' : '' }}" href="{{ route('sa.supervisor.request-extend') }}">
         <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
         <i class="material-icons opacity-10">event_available</i>
         </div>
-        <span class="nav-link-text ms-1">Pending Request</span>
+        <span class="nav-link-text ms-1">Pending Request From Agent</span>
     </a>
     </li>
 
@@ -188,11 +188,11 @@
         </a>
     </li>
     <li class="nav-item">
-    <a class="nav-link text-white {{ $page == 'Update Tickets' ? 'active bg-gradient-primary' : '' }}" href="{{ route('sa.supervisor.summary-report-sumpervisor') }}">
+    <a class="nav-link text-white {{ $page == 'Ticket Update' ? 'active bg-gradient-primary' : '' }}" href="{{ route('sa.supervisor.summary-report-sumpervisor') }}">
         <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
         <i class="material-icons opacity-10">receipt_long</i>
         </div>
-        <span class="nav-link-text ms-1">Update Tickets</span>
+        <span class="nav-link-text ms-1">Ticket Update</span>
     </a>
     </li>
     <li class="nav-item">
@@ -204,11 +204,11 @@
         </a>
     </li>
     <li class="nav-item">
-        <a class="nav-link text-white {{ $page == 'SLA Report Sales Admin' ? 'active bg-gradient-primary' : '' }}" href="{{ route('sa.supervisor.summary-report-sumpervisor-sla_sa') }}">
+        <a class="nav-link text-white {{ $page == 'Ticket Detailed Report Sales Admin' ? 'active bg-gradient-primary' : '' }}" href="{{ route('sa.supervisor.summary-report-sumpervisor-sla_sa') }}">
         <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
             <i class="material-icons opacity-10">summarize</i>
         </div>
-        <span class="nav-link-text ms-1">SLA Report Sales Admin</span>
+        <span class="nav-link-text ms-1">Ticket Detailed Report Sales Admin</span>
         </a>
     </li>
     <li class="nav-item">
@@ -236,11 +236,11 @@
         </a>
       </li>
     <li class="nav-item">
-        <a class="nav-link text-white {{ $page == 'Category and Base Unit' ? 'active bg-gradient-primary' : '' }}" href="{{ route('category.index') }}">
+        <a class="nav-link text-white {{ $page == 'Category And SLA' ? 'active bg-gradient-primary' : '' }}" href="{{ route('category.index') }}">
         <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
             <i class="material-icons opacity-10">category</i>
         </div>
-        <span class="nav-link-text ms-1">Category And Base Unit</span>
+        <span class="nav-link-text ms-1">Category And SLA</span>
         </a>
     </li>
     <li class="nav-item">
@@ -279,7 +279,7 @@
         </a>
     </li>
 
-   
+
 
     <li class="nav-item">
         <a class="nav-link text-white {{ $page == 'My Task' ? 'active bg-gradient-primary' : '' }}" href="{{ route('sa.agent.myticket') }}">
@@ -292,11 +292,11 @@
 
 
     <li class="nav-item">
-    <a class="nav-link text-white {{ $page == 'Pending Request' ? 'active bg-gradient-primary' : '' }}" href="{{ route('sa.supervisor.request-extend') }}">
+    <a class="nav-link text-white {{ $page == 'Pending Request From Agent' ? 'active bg-gradient-primary' : '' }}" href="{{ route('sa.supervisor.request-extend') }}">
         <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
         <i class="material-icons opacity-10">event_available</i>
         </div>
-        <span class="nav-link-text ms-1">Pending Request</span>
+        <span class="nav-link-text ms-1">Pending Request From Agent</span>
     </a>
     </li>
     <li class="nav-item">
@@ -308,11 +308,11 @@
         </a>
     </li>
     <li class="nav-item">
-    <a class="nav-link text-white {{ $page == 'Update Tickets' ? 'active bg-gradient-primary' : '' }}" href="{{ route('sa.supervisor.summary-report-sumpervisor') }}">
+    <a class="nav-link text-white {{ $page == 'Ticket Update' ? 'active bg-gradient-primary' : '' }}" href="{{ route('sa.supervisor.summary-report-sumpervisor') }}">
         <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
         <i class="material-icons opacity-10">receipt_long</i>
         </div>
-        <span class="nav-link-text ms-1">Update Tickets</span>
+        <span class="nav-link-text ms-1">Ticket Update</span>
     </a>
     </li>
     <li class="nav-item">
@@ -324,19 +324,19 @@
         </a>
     </li>
     <li class="nav-item">
-        <a class="nav-link text-white {{ $page == 'SLA Report Sales Admin' ? 'active bg-gradient-primary' : '' }}" href="{{ route('sa.supervisor.summary-report-sumpervisor-sla_sa') }}">
+        <a class="nav-link text-white {{ $page == 'Ticket Detailed Report Sales Admin' ? 'active bg-gradient-primary' : '' }}" href="{{ route('sa.supervisor.summary-report-sumpervisor-sla_sa') }}">
         <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
             <i class="material-icons opacity-10">summarize</i>
         </div>
-        <span class="nav-link-text ms-1">SLA Report Sales Admin</span>
+        <span class="nav-link-text ms-1">Ticket Detailed Report Sales Admin</span>
         </a>
     </li>
     <li class="nav-item">
-        <a class="nav-link text-white {{ $page == 'Category and Base Unit' ? 'active bg-gradient-primary' : '' }}" href="{{ route('category.index') }}">
+        <a class="nav-link text-white {{ $page == 'Category And SLA' ? 'active bg-gradient-primary' : '' }}" href="{{ route('category.index') }}">
         <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
             <i class="material-icons opacity-10">category</i>
         </div>
-        <span class="nav-link-text ms-1">Category And Base Unit</span>
+        <span class="nav-link-text ms-1">Category And SLA</span>
         </a>
     </li>
     <li class="nav-item">
@@ -376,27 +376,27 @@
     </li>
 
     <li class="nav-item">
-    <a class="nav-link text-white {{ $page == 'Pending Request' ? 'active bg-gradient-primary' : '' }}" href="{{ route('sa.supervisor.request-extend') }}">
+    <a class="nav-link text-white {{ $page == 'Pending Request From Agent' ? 'active bg-gradient-primary' : '' }}" href="{{ route('sa.supervisor.request-extend') }}">
         <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
         <i class="material-icons opacity-10">event_available</i>
         </div>
-        <span class="nav-link-text ms-1">Pending Request</span>
+        <span class="nav-link-text ms-1">Pending Request From Agent</span>
     </a>
     </li>
-    <li class="nav-item">
+    {{-- <li class="nav-item">
         <a class="nav-link text-white {{ $page == 'Tasking' ? 'active bg-gradient-primary' : '' }}" href="{{ route('sa.supervisor.create') }}">
         <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
             <i class="material-icons opacity-10">add_task</i>
         </div>
         <span class="nav-link-text ms-1">Tasking</span>
         </a>
-    </li>
+    </li> --}}
     <li class="nav-item">
-    <a class="nav-link text-white {{ $page == 'Update Tickets' ? 'active bg-gradient-primary' : '' }}" href="{{ route('sa.supervisor.summary-report-sumpervisor') }}">
+    <a class="nav-link text-white {{ $page == 'Ticket Update' ? 'active bg-gradient-primary' : '' }}" href="{{ route('sa.supervisor.summary-report-sumpervisor') }}">
         <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
         <i class="material-icons opacity-10">receipt_long</i>
         </div>
-        <span class="nav-link-text ms-1">Update Tickets</span>
+        <span class="nav-link-text ms-1">Ticket Update</span>
     </a>
     </li>
     <li class="nav-item">
@@ -408,19 +408,19 @@
         </a>
     </li>
     <li class="nav-item">
-        <a class="nav-link text-white {{ $page == 'SLA Report Sales Admin' ? 'active bg-gradient-primary' : '' }}" href="{{ route('sa.supervisor.summary-report-sumpervisor-sla_sa') }}">
+        <a class="nav-link text-white {{ $page == 'Ticket Detailed Report Sales Admin' ? 'active bg-gradient-primary' : '' }}" href="{{ route('sa.supervisor.summary-report-sumpervisor-sla_sa') }}">
         <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
             <i class="material-icons opacity-10">summarize</i>
         </div>
-        <span class="nav-link-text ms-1">SLA Report Sales Admin</span>
+        <span class="nav-link-text ms-1">Ticket Detailed Report Sales Admin</span>
         </a>
     </li>
     <li class="nav-item">
-        <a class="nav-link text-white {{ $page == 'Category and Base Unit' ? 'active bg-gradient-primary' : '' }}" href="{{ route('category.index') }}">
+        <a class="nav-link text-white {{ $page == 'Category And SLA' ? 'active bg-gradient-primary' : '' }}" href="{{ route('category.index') }}">
         <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
             <i class="material-icons opacity-10">category</i>
         </div>
-        <span class="nav-link-text ms-1">Category And Base Unit</span>
+        <span class="nav-link-text ms-1">Category And SLA</span>
         </a>
     </li>
     <li class="nav-item">
@@ -459,11 +459,11 @@
     </a>
 </li>
 <li class="nav-item">
-        <a class="nav-link text-white {{ $page == 'SLA Report Sales Admin' ? 'active bg-gradient-primary' : '' }}" href="{{ route('sa.supervisor.summary-report-sumpervisor-sla_sa') }}">
+        <a class="nav-link text-white {{ $page == 'Ticket Detailed Report Sales Admin' ? 'active bg-gradient-primary' : '' }}" href="{{ route('sa.supervisor.summary-report-sumpervisor-sla_sa') }}">
         <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
             <i class="material-icons opacity-10">summarize</i>
         </div>
-        <span class="nav-link-text ms-1">SLA Report Sales Admin</span>
+        <span class="nav-link-text ms-1">Ticket Detailed Report Sales Admin</span>
         </a>
     </li>
 <li class="nav-item">
@@ -483,11 +483,11 @@
         </a>
 </li>
 <li class="nav-item">
-        <a class="nav-link text-white {{ $page == 'Category and Base Unit' ? 'active bg-gradient-primary' : '' }}" href="{{ route('category.index') }}">
+        <a class="nav-link text-white {{ $page == 'Category And SLA' ? 'active bg-gradient-primary' : '' }}" href="{{ route('category.index') }}">
           <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
             <i class="material-icons opacity-10">category</i>
           </div>
-          <span class="nav-link-text ms-1">Category And Base Unit</span>
+          <span class="nav-link-text ms-1">Category And SLA</span>
         </a>
 </li>
 <li class="nav-item">
@@ -593,19 +593,19 @@
     </a>
 </li>
 <li class="nav-item">
-        <a class="nav-link text-white {{ $page == 'SLA Report Sales Admin' ? 'active bg-gradient-primary' : '' }}" href="{{ route('sa.supervisor.summary-report-sumpervisor-sla_sa') }}">
+        <a class="nav-link text-white {{ $page == 'Ticket Detailed Report Sales Admin' ? 'active bg-gradient-primary' : '' }}" href="{{ route('sa.supervisor.summary-report-sumpervisor-sla_sa') }}">
         <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
             <i class="material-icons opacity-10">summarize</i>
         </div>
-        <span class="nav-link-text ms-1">SLA Report Sales Admin</span>
+        <span class="nav-link-text ms-1">Ticket Detailed Report Sales Admin</span>
         </a>
     </li>
 <li class="nav-item">
-      <a class="nav-link text-white {{ $page == 'Category and Base Unit' ? 'active bg-gradient-primary' : '' }}" href="{{ route('category.index') }}">
+      <a class="nav-link text-white {{ $page == 'Category And SLA' ? 'active bg-gradient-primary' : '' }}" href="{{ route('category.index') }}">
         <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
           <i class="material-icons opacity-10">category</i>
         </div>
-        <span class="nav-link-text ms-1">Category And Base Unit</span>
+        <span class="nav-link-text ms-1">Category And SLA</span>
       </a>
 </li>
 <li class="nav-item">
@@ -634,11 +634,11 @@
     </a>
   </li>
  <li class="nav-item">
-    <a class="nav-link text-white {{ $page == 'Pending Request' ? 'active bg-gradient-primary' : '' }}" href="{{ route('sa.agent.create') }}">
+    <a class="nav-link text-white {{ $page == 'Pending Request From Agent' ? 'active bg-gradient-primary' : '' }}" href="{{ route('sa.agent.create') }}">
       <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
         <i class="material-icons opacity-10">work_history</i>
       </div>
-      <span class="nav-link-text ms-1">Pending Request</span>
+      <span class="nav-link-text ms-1">Pending Request From Agent</span>
     </a>
   </li>
  <hr class="horizontal light mt-0 mb-2">

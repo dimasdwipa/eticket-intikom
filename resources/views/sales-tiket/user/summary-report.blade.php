@@ -29,8 +29,8 @@
             padding-left: 1rem;
             padding-right: 1rem;
         }
-    {{-- rating --}}
-        .rating {
+
+        {{-- rating --}} .rating {
             border: none;
             float: left;
         }
@@ -82,8 +82,8 @@
                                 class="tableku align-items-center justify-content-center my-0 tablesorter table-hover striped">
                                 <thead>
                                     <tr>
-                                        <th
-                                            class="text-center text-uppercase text-secondary text-xs font-weight-bolder  ps-3" style="min-width: 10rem">
+                                        <th class="text-center text-uppercase text-secondary text-xs font-weight-bolder  ps-3"
+                                            style="min-width: 10rem">
                                             Action
                                         </th>
                                         <th>
@@ -116,7 +116,7 @@
                                             style="min-width: 6rem">
                                             CRM No. / Ref No.
                                         </th>
-                                    
+
                                         <th class="text-uppercase text-secondary text-xs font-weight-bolder  ps-3"
                                             style="min-width: 6rem">
                                             Description
@@ -161,9 +161,9 @@
                                             style="min-width: 10rem">
                                             Respon
                                         </th>
-                                      
+
                                         <th class="text-uppercase text-secondary text-xs font-weight-bolder  ps-3"
-                                        style="min-width: 10rem">
+                                            style="min-width: 10rem">
                                             Start Doc. Update
                                         </th>
                                         <th class="text-uppercase text-secondary text-xs font-weight-bolder  ps-3"
@@ -190,6 +190,12 @@
                                             style="min-width: 10rem">
                                             Finish
                                         </th>
+
+                                        <th class="text-uppercase text-secondary text-xs font-weight-bolder  ps-3"
+                                            style="min-width: 10rem">
+                                            Complain Date
+                                        </th>
+
                                         <th class="text-uppercase text-secondary text-xs font-weight-bolder  ps-3"
                                             style="min-width: 10rem">
                                             Closed
@@ -202,75 +208,73 @@
                                             style="min-width: 10rem">
                                             Priority
                                         </th>
-                                        
-                                    
+
+
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach ($tickets as $item)
                                         <tr>
-                                          
+
                                             <td style="text-align:center;">
                                                 @if ($item->status != 'Closed')
                                                     @if ($item->status != 'Canceled')
-                                                    @if ($item->status == 'Document Revison')
-                                                    <div class="p-1">
-                                                        <a href="{{ route('sa.sales-ticket.edit', ['sales_ticket' => $item->id ]) }}"
-                                                            class="btn btn-sm btn-outline-info m-0 p-1">Update Ticket</a>
-                                                    </div>
-                                                    @endif
-                                                    @if ($item->status == 'Resolved')
-                                                    <div class="btn-group btn-group-sm" role="group">
-                                                    
-                                                        <button type="button"
-                                                            class="btn btn-sm btn-outline-success m-0 p-1"
-                                                            style="width: 5rem" data-bs-toggle="modal"
-                                                            data-bs-target="#close"
-                                                            data-id="{{ $item->id }}">Close</button>
-                                                        <button type="button"
-                                                            class="btn btn-sm btn-outline-warning m-0 p-1"
-                                                            style="width: 5rem" data-bs-toggle="modal"
-                                                            data-bs-target="#complain" data-id="{{ $item->id }}"
-                                                            data-code="{{ $item->code }}"
-                                                            data-katagori="{{ $item->katagoriAllTeams->kategori ?? '' }}"
-                                                            data-status="{{ $item->status }}"
-                                                            data-agent="{{ $item->agent->name ?? '--' }}">Complain</button>
-                                                    </div>
-                                                    @endif
-                                                    @endif
+                                                        @if ($item->status == 'Document Revison')
+                                                            <div class="p-1">
+                                                                <a href="{{ route('sa.sales-ticket.edit', ['sales_ticket' => $item->id]) }}"
+                                                                    class="btn btn-sm btn-outline-info m-0 p-1">Update
+                                                                    Ticket</a>
+                                                            </div>
+                                                        @endif
+                                                        @if ($item->status == 'Resolved')
+                                                            <div class="btn-group btn-group-sm" role="group">
 
+                                                                <button type="button"
+                                                                    class="btn btn-sm btn-outline-success m-0 p-1"
+                                                                    style="width: 5rem" data-bs-toggle="modal"
+                                                                    data-bs-target="#close"
+                                                                    data-id="{{ $item->id }}">Close</button>
+                                                                <button type="button"
+                                                                    class="btn btn-sm btn-outline-warning m-0 p-1"
+                                                                    style="width: 5rem" data-bs-toggle="modal"
+                                                                    data-bs-target="#complain" data-id="{{ $item->id }}"
+                                                                    data-code="{{ $item->code }}"
+                                                                    data-katagori="{{ $item->katagoriAllTeams->kategori ?? '' }}"
+                                                                    data-status="{{ $item->status }}"
+                                                                    data-agent="{{ $item->agent->name ?? '--' }}">Complain</button>
+                                                            </div>
+                                                        @endif
+                                                    @endif
                                                 @endif
 
-                                                @if (($item->status == 'Closed'||$item->status == 'Canceled' )&& empty($item->rating))
-                                                    <button type="button"
-                                                            class="btn btn-sm btn-outline-secondary m-0 p-1"
-                                                            style="width: 10rem" data-bs-toggle="modal"
-                                                            data-bs-target="#rating"
-                                                            data-id="{{ $item->id }}">Give Rating</button>
+                                                @if (($item->status == 'Closed' || $item->status == 'Canceled') && empty($item->rating))
+                                                    <button type="button" class="btn btn-sm btn-outline-secondary m-0 p-1"
+                                                        style="width: 10rem" data-bs-toggle="modal" data-bs-target="#rating"
+                                                        data-id="{{ $item->id }}">Give Rating</button>
                                                 @endif
                                             </td>
                                             <td class="font-weight-bold">
                                                 #{{ $item->code }}
                                             </td>
                                             <td>
-                                                @if($item->status=='Resolved')
+                                                @if ($item->status == 'Resolved')
                                                     Finish
                                                 @else
-                                                    {{ $item->status}}
+                                                    {{ $item->status }}
                                                 @endif
                                             </td>
                                             <td>{{ date_format(date_create($item->created_at), 'd-M-y') }}</td>
                                             <td>{{ $item->agent->name ?? '' }}</td>
                                             <td>
-                                                {{$item->sub_katagoriAllTeams->sub_kategori??''}}
+                                                {{ $item->sub_katagoriAllTeams->sub_kategori ?? '' }}
                                             </td>
                                             <td>
-                                            {{$item->customer}}
+                                                {{ $item->customer }}
                                             </td>
                                             <td>{{ $item->bu }}</td>
-                                        
+
                                             <td>
-                                            {{$item->no_CRM}}
+                                                {{ $item->no_CRM }}
                                             </td>
                                             <td class="text-center">
                                                 <button type="button" class="btn btn-sm btn-outline-info m-0 p-1"
@@ -278,30 +282,33 @@
                                                     data-problem="{{ $item->problem }}">Detail</button>
                                             </td>
                                             <td class="text-center">
-                                            {{$item->quot_itk==0?'No':'Yes'}}
+                                                {{ $item->quot_itk == 0 ? 'No' : 'Yes' }}
                                             </td>
                                             <td class="text-center">
-                                            {{$item->po_customer==0?'No':'Yes'}}
+                                                {{ $item->po_customer == 0 ? 'No' : 'Yes' }}
                                             </td>
                                             <td class="text-center">
-                                            {{$item->po_suplayer==0?'No':'Yes'}}
+                                                {{ $item->po_suplayer == 0 ? 'No' : 'Yes' }}
                                             </td>
                                             <td class="text-center">
-                                            {{$item->cost_sheet==0?'No':'Yes'}}
+                                                {{ $item->cost_sheet == 0 ? 'No' : 'Yes' }}
                                             </td>
                                             <td>
-                                            {{$item->other}}
+                                                {{ $item->other }}
                                             </td>
                                             <td>
                                                 @foreach ($item->file_manager as $value_file)
                                                     <div class="btn-group btn-group-sm" role="group">
-                                                        <a class="btn btn-sm btn-outline-info m-0 p-1"
-                                                        style="width: 5rem" href="{{asset('storage/files/tickets/'.$value_file->file)}}" target="_blank" >
-                                                        Show
+                                                        <a class="btn btn-sm btn-outline-info m-0 p-1" style="width: 5rem"
+                                                            href="{{ asset('storage/files/tickets/' . $value_file->file) }}"
+                                                            target="_blank">
+                                                            Show
                                                         </a>
                                                         <a class="btn btn-sm btn-outline-success m-0 p-1"
-                                                        style="width: 5rem" href="{{asset('storage/files/tickets/'.$value_file->file)}}" target="_blank"  download>
-                                                        Donwload
+                                                            style="width: 5rem"
+                                                            href="{{ asset('storage/files/tickets/' . $value_file->file) }}"
+                                                            target="_blank" download>
+                                                            Donwload
                                                         </a>
                                                     </div>
                                                 @endforeach
@@ -314,7 +321,7 @@
                                             </td>
                                             <td>{{ formatDate($item->sla_assignment) }}</td>
                                             <td>{{ formatDate($item->sla_respone) }}</td>
-                                       
+
                                             <td>{{ formatDate($item->sla_revison) }}</td>
                                             <td>{{ formatDate($item->sla_revison_end) }}</td>
                                             <td>{{ formatDate($item->sla_pending) }}</td>
@@ -322,24 +329,26 @@
                                             <td>{{ formatDate($item->start_work) }}</td>
                                             <td>{{ formatDate($item->end_work) }}</td>
                                             <td>{{ formatDate($item->sla_resolved) }}</td>
+                                            <td>{{ formatDate($item->complains()->where('status', 'Complain')->latest()->first()->created_at ?? null) }}
+                                            </td>
                                             <td>{{ formatDate($item->sla_close) }}</td>
                                             <td>
-                                                @if($item->rating=="1")
+                                                @if ($item->rating == '1')
                                                     Disappointed
-                                                @elseif($item->rating=="2")
+                                                @elseif($item->rating == '2')
                                                     Unsatisfied
-                                                @elseif($item->rating=="3")
+                                                @elseif($item->rating == '3')
                                                     Quite satisfied
-                                                @elseif($item->rating=="4")
+                                                @elseif($item->rating == '4')
                                                     Satisfied
-                                                @elseif($item->rating=="5")
+                                                @elseif($item->rating == '5')
                                                     Very satisfied
                                                 @endif
                                             </td>
                                             <td>
                                                 {{ $item->prioritas }}
                                             </td>
-                                           
+
                                         </tr>
                                     @endforeach
 
@@ -352,22 +361,23 @@
             </div>
             <div id="sidebar_data" style="display:none" class="col-3">
                 <div class="card shadow-lg">
-                <div class="card-header pb-0 pt-3">
-                    <div class="text-right">
-                        <button class="btn btn-link text-dark p-0 m-0 fixed-plugin-close-button" id="close_sidebar_data">
-                            <i class="material-icons">clear</i>
-                        </button>
+                    <div class="card-header pb-0 pt-3">
+                        <div class="text-right">
+                            <button class="btn btn-link text-dark p-0 m-0 fixed-plugin-close-button"
+                                id="close_sidebar_data">
+                                <i class="material-icons">clear</i>
+                            </button>
+                        </div>
+                        <div class="float-start">
+                            <h6 class="mt-1 mb-0">Data Ticket</h6>
+                        </div>
+
+                        <!-- End Toggle Button -->
                     </div>
-                    <div class="float-start">
-                    <h6 class="mt-1 mb-0">Data Ticket</h6>
+                    <hr class="horizontal dark my-1">
+                    <div id="sidebar_data_body" class="card-body pt-sm-3 pt-0">
+
                     </div>
-                   
-                    <!-- End Toggle Button -->
-                </div>
-                <hr class="horizontal dark my-1">
-                <div id="sidebar_data_body" class="card-body pt-sm-3 pt-0">
-                   
-                </div>
                 </div>
             </div>
         </div>
@@ -453,8 +463,10 @@
                                 <div class="input-group input-group-static my-3">
                                     <select class="form-control form-control-sm select2" name="team_id">
                                         <option disabled selected style="text-secondary">Tenant</option>
-                                        @foreach ( Auth::user()->teams as $item )
-                                            <option value="{{$item->id}}" @if (isset($_GET['team_id']) ? ($_GET['team_id'] == $item->id ? true : false) : false) selected @endif>{{ $item->name }}</option>
+                                        @foreach (Auth::user()->teams as $item)
+                                            <option value="{{ $item->id }}"
+                                                @if (isset($_GET['team_id']) ? ($_GET['team_id'] == $item->id ? true : false) : false) selected @endif>{{ $item->name }}
+                                            </option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -492,7 +504,7 @@
                         <div class="py-0 text-center align-items-center justify-content-center">
                             <div><small>Please, don't forget to give a star rating</small></div>
                             <div class="rating mx-0">
-                                <input type="radio" id="star5" name="rating" value="5"  />
+                                <input type="radio" id="star5" name="rating" value="5" />
                                 <label class="star" for="star5" title="Awesome" aria-hidden="true"></label>
                                 <input type="radio" id="star4" name="rating" value="4" />
                                 <label class="star" for="star4" title="Great" aria-hidden="true"></label>
@@ -501,7 +513,7 @@
                                 <input type="radio" id="star2" name="rating" value="2" />
                                 <label class="star" for="star2" title="Good" aria-hidden="true"></label>
                                 <input type="radio" id="star1" name="rating" value="1" required />
-                                <label class="star" for="star1" title="Bad" aria-hidden="true" ></label>
+                                <label class="star" for="star1" title="Bad" aria-hidden="true"></label>
                             </div>
                             <div class="input-group input-group-static mb-4">
                                 <textarea class="form-control form-control-sm bg-white" style="border-radius:0.25rem !important" rows="2"
@@ -511,7 +523,7 @@
                     </div>
                     <div class="modal-footer py-2 bg-gray-200">
                         <button type="submit" class="btn btn-outline-success btn-sm m-0">
-                           Submit
+                            Submit
                         </button>
                     </div>
                 </form>
@@ -554,9 +566,9 @@
                             <input readonly type="text" name="agent" class="form-control" id="agent_ticket">
                         </div>
                         <div class="input-group input-group-static mb-4">
-                        <label class="text-dark">Comment</label>
-                            <textarea id="comment" placeholder="write your comment hire .." class="form-control form-control-sm" style="border-radius:0.25rem !important" rows="3"
-                                name="comment" required></textarea>
+                            <label class="text-dark">Comment</label>
+                            <textarea id="comment" placeholder="write your comment hire .." class="form-control form-control-sm"
+                                style="border-radius:0.25rem !important" rows="3" name="comment" required></textarea>
                         </div>
                     </div>
                     <div class="modal-footer py-2 bg-gray-200">
@@ -591,7 +603,7 @@
                         <div class="py-0 text-center align-items-center justify-content-center">
                             <div><small>Please, don't forget to give a star rating</small></div>
                             <div class="rating mx-0">
-                                <input type="radio" id="starku5" name="rating" value="5"  />
+                                <input type="radio" id="starku5" name="rating" value="5" />
                                 <label class="starku" for="starku5" title="Awesome" aria-hidden="true"></label>
                                 <input type="radio" id="starku4" name="rating" value="4" />
                                 <label class="starku" for="starku4" title="Great" aria-hidden="true"></label>
@@ -600,7 +612,7 @@
                                 <input type="radio" id="starku2" name="rating" value="2" />
                                 <label class="starku" for="starku2" title="Good" aria-hidden="true"></label>
                                 <input type="radio" id="starku1" name="rating" value="1" required />
-                                <label class="starku" for="starku1" title="Bad" aria-hidden="true" ></label>
+                                <label class="starku" for="starku1" title="Bad" aria-hidden="true"></label>
                             </div>
                             <div class="input-group input-group-static mb-4">
                                 <textarea class="form-control form-control-sm bg-white" style="border-radius:0.25rem !important" rows="2"
@@ -633,23 +645,35 @@
                     {
                         extend: 'excelHtml5',
                         footer: true,
+                        exportOptions: {
+                            columns: ':not(:contains("Action"))' // Exclude columns with the name "B"
+                        },
                         className: 'btn btn-sm btn-success shadow rounded'
                     },
                     {
                         extend: 'csvHtml5',
                         footer: true,
+                        exportOptions: {
+                            columns: ':not(:contains("Action"))' // Exclude columns with the name "B"
+                        },
                         className: 'btn btn-sm btn-success shadow rounded'
                     },
                     {
                         extend: 'pdfHtml5',
                         footer: true,
                         orientation: 'landscape',
+                        exportOptions: {
+                            columns: ':not(:contains("Action"))' // Exclude columns with the name "B"
+                        },
                         className: 'btn btn-sm btn-success shadow rounded'
                     },
                     {
                         extend: 'print',
                         footer: true,
                         orientation: 'landscape',
+                        exportOptions: {
+                            columns: ':not(:contains("Action"))' // Exclude columns with the name "B"
+                        },
                         className: 'btn btn-sm btn-success shadow rounded',
 
                         customize: function(win) {
@@ -686,14 +710,14 @@
         });
 
         $('#Detail').on('show.bs.modal', function(event) {
-                var button = $(event.relatedTarget)
-                var problem = button.data('problem')// E// Extract info from data-* attributes
-                // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
-                // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
-                var modal = $(this)
-                // modal.find('.modal-title').text(recipient)
-                modal.find('#problem_ticket').text(problem) // Extract info from data-* attributes
-            });
+            var button = $(event.relatedTarget)
+            var problem = button.data('problem') // E// Extract info from data-* attributes
+            // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
+            // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
+            var modal = $(this)
+            // modal.find('.modal-title').text(recipient)
+            modal.find('#problem_ticket').text(problem) // Extract info from data-* attributes
+        });
 
         $(document).ready(function() {
             $('.filter').attr('data-bs-toggle', 'modal');
@@ -763,16 +787,16 @@
                 $("#to").datepicker("option", "minDate", minValue);
             })
         });
-        $('#close_sidebar_data').click(function (e) { 
+        $('#close_sidebar_data').click(function(e) {
             $('#sidebar_data').hide();
-                $('#table_data').removeClass('col-9');
-                $('#table_data').addClass('col-12');
+            $('#table_data').removeClass('col-9');
+            $('#table_data').addClass('col-12');
         });
         $(document).ready(function() {
-           
+
             // Reference to the sidebar
             var sidebar = $('#sidebar_data');
-            
+
             // Add a click event listener to all table rows
             $('.tableku tr').click(function() {
                 // Hide the sidebar initially
@@ -795,9 +819,9 @@
                 content += "<table>"
                 // Loop through the td elements and append their values to the content string
                 cells.each(function(index) {
-                    content += '<tr><td>'+header[index]+'</td>';
+                    content += '<tr><td>' + header[index] + '</td>';
                     content += '<td>&nbsp&nbsp:&nbsp&nbsp</td>';
-                    content += '<td>'+ $(this).text()+'</td></tr>';
+                    content += '<td>' + $(this).text() + '</td></tr>';
                 });
 
                 content += "</table>"

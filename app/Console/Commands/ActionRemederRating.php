@@ -45,11 +45,15 @@ class ActionRemederRating extends Command
         $query->where('status', 'Resolved')
         ->orwhere('status', 'Closed');
     })
-    ->whereRaw('DATE_ADD(sla_resolved , interval 1440 MINUTE) > now() or DATE_ADD(sla_close , interval 1440 MINUTE) > now()')
+    // ->whereRaw('DATE_ADD(sla_resolved , interval 1440 MINUTE) > now() or DATE_ADD(sla_close , interval 1440 MINUTE) > now()')
+    // ->whereRaw('DATEADD(MINUTE, 1440, sla_resolved) > GETDATE() OR DATEADD(MINUTE, 1440, sla_close) > GETDATE()')
+    ->where(function($query) {
+        $query->whereRaw("DATEADD(MINUTE, 1440, sla_resolved) > GETDATE()")
+              ->orWhereRaw("DATEADD(MINUTE, 1440, sla_close) > GETDATE()");
+    })
     ->whereNull("rating")
     ->allTeams()
     ->get();
-
 
         foreach ($tickets as $item){
                      DB::beginTransaction();
@@ -66,18 +70,18 @@ class ActionRemederRating extends Command
                          $data->save();
                          $email=new MailController();
                          $email->remederrating($data_ticket);
-                       
+
                          DB::commit();
-                       
+
                      } catch (\Throwable $th) {
-                      
+
 
                          DB::rollback();
                          return print($th);
 
                      }
 
-            
+
         }
 
      return 200;

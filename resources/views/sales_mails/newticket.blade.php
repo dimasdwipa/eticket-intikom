@@ -15,7 +15,7 @@
     </tr>
     <tr>
         <td>
-            <div style="text-align:left;padding-bottom:10px">Please create an SO ({{$data->first()->sub_katagori->sub_kategori}}) with the following data : :</div>
+            <div style="text-align:left;padding-bottom:10px">Please create an ({{$data->first()->sub_katagori->sub_kategori}}) with the following data :</div>
         </td>
     </tr>
 </table>

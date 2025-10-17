@@ -1,4 +1,4 @@
-@extends('layouts.app', ['page' => 'Update Tickets', 'pageSlug' => 'Update Tickets', 'section' => 'Update Tickets'])
+@extends('layouts.app', ['page' => 'Ticket Update', 'pageSlug' => 'Ticket Update', 'section' => 'Ticket Update'])
 
 @section('content')
 <div class="container-fluid py-4">
@@ -8,7 +8,7 @@
             <div class="card my-4">
                 <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
                     <div class="bg-gradient-primary shadow-primary border-radius-lg pt-2 pb-1">
-                        <h6 class="text-white text-capitalize ps-3">Update Tickets </h6>
+                        <h6 class="text-white text-capitalize ps-3">Ticket Update </h6>
                     </div>
                 </div>
                 <div class="card-body px-0 pb-2">
@@ -259,7 +259,7 @@
                                         </select>
                                         @endif
                                     </td>
-                                  
+
                                     <td class="text-center">
                                         @if ($item->status=="Canceled" || $item->status=="Closed" )
                                         @else

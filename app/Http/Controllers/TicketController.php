@@ -16,6 +16,8 @@ use App\Http\Controllers\MailController;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Http\File;
+use Illuminate\Pagination\Paginator; // <-- 1. TAMBAHKAN INI DI ATAS
 
 
 class TicketController extends Controller
@@ -36,7 +38,7 @@ class TicketController extends Controller
 
             }
 
-            if (Auth::user()->role=="user"||Auth::user()->role=="administrator"||Auth::user()->role=="supervisor-agent-user"||Auth::user()->role=="supervisor-user"||Auth::user()->role=="agent-user"){
+            if (Auth::user()->role=="user"||Auth::user()->role=="administrator"||Auth::user()->role=="supervisor-agent-user"||Auth::user()->role=="supervisor-user"||Auth::user()->role=="agent-user"||Auth::user()->role=="manager"){
 
                 return $next($request);
             }else{
@@ -54,9 +56,9 @@ class TicketController extends Controller
         //     $tickets=Ticket::whereBetween('created_at',[$_GET['start_date'],  $_GET['end_date']])->get();
         // }else{
 
-            
-            
-          
+
+
+
             $tickets=Ticket::where('user_id',Auth::id())
             ->where('status','!=','Closed')
             ->where('status','!=','Canceled')
@@ -67,7 +69,7 @@ class TicketController extends Controller
             ->orderby('created_at','desc')->get();
 
 
-            $tickets_icon=Ticket::whereBetween('created_at',[Carbon::now()->subYear(), Carbon::now()])
+            $tickets_icon=Ticket::whereBetween('created_at',[Carbon::now()->startOfYear(), Carbon::now()])
             ->where('user_id',Auth::id())
             ->allTeams()
             // ->when(!empty($_GET['status']),function($query){
@@ -115,11 +117,13 @@ class TicketController extends Controller
             'team_id.*' => 'required',
         ]);
 
+        $startOfYear = Carbon::now()->startOfYear();
         $block_add_ticket=Ticket::where('user_id',Auth::id())
         ->where('status','closed')
+        ->where('created_at', '>', $startOfYear)
         ->wherenull('rating')
         ->first();
-      
+
         if(!empty($block_add_ticket)){
             return back()->with('error','Anda belum memberikan rating pada ticket #'.$block_add_ticket->code.', mohon memberikan rating terlebih dahulu ');
         }
@@ -154,9 +158,18 @@ class TicketController extends Controller
                 } catch (\Throwable $th) {
                     //throw $th;
                 }
+
                 $save->save();
+
                 if($file_data){
-                    Storage::putFileAs("public/files/tickets",$request->file('files')[$key],$code.$key.'.'.$request->file('files')[$key]->extension());
+                 try{
+
+                    $filePath = Storage::putFileAs("public/files/tickets",$request->file('files')[$key],$code.$key.'.'.$request->file('files')[$key]->extension());
+
+                    }catch (\Throwable $th) {
+
+                        DB::rollBack();
+                    }
                 }
 
                 $data = new Complain();
@@ -182,6 +195,7 @@ class TicketController extends Controller
 
         } catch (\Throwable $th) {
             DB::rollBack();
+            dd($th);
             return back()->with('error',$th);
         }
 
@@ -314,7 +328,7 @@ class TicketController extends Controller
             'comment' => 'required'
         ]);
 
-        
+
         $data = Ticket::allTeams()->find($request->id);
         $data->rating = $request->rating;
         $data->comment_requestor = $request->comment;
@@ -336,36 +350,47 @@ class TicketController extends Controller
         return back()->with('success','Rating Ticket #'.$data->code.' successfully.');
     }
 
-    public function report(Request $request){
+    public function report(Request $request)
+    {
+        // Hanya menampilkan view, data akan diambil oleh JavaScript.
+        return view('ticket.summary-report');
+    }
 
-        $hari_ini = date("Y-m-d");
-        $tgl_pertama = date('Y-m-t', strtotime(date("Y-m-d", strtotime($hari_ini)) . " - 365 day"));
-        $tgl_terakhir = date('Y-m-t', strtotime($hari_ini));
+    public function getSummaryReportApi(Request $request)
+    {
+        // 2. Ambil parameter 'length' & 'start' yang dikirim oleh DataTables
+        $length = $request->input('length', 15);
+        $start = $request->input('start', 0);
+        $page = ($start / $length) + 1;
 
-        if(!empty($_GET['start_date'])){
-            $tgl_pertama=$_GET['start_date'];
-        }
+        // 3. Beritahu Laravel secara manual halaman mana yang sedang diminta
+        Paginator::currentPageResolver(function () use ($page) {
+            return $page;
+        });
+        
+        $startDate = $request->input('start_date', date('Y-01-01'));
+        $endDate = $request->input('end_date', date('Y-m-d'));
 
-        if(!empty($_GET['end_date'])){
-
-            $tgl_terakhir= $_GET['end_date'];
-        }
-
-        $tickets=Ticket::select('tickets.*','users.name')
-            ->leftjoin('users','tickets.agent_id','=','users.id')
-            ->where('user_id',Auth::id())
+        // Query-nya tetap sama, tapi sekarang paginate() akan menggunakan halaman yang benar
+        $paginatedTickets = Ticket::with(['agent:id,name', 'user:id,name', 'lokasi', 'katagori', 'sub_katagori', 'team'])
+            ->where('user_id', Auth::id())
             ->allTeams()
-            ->when(!empty($_GET['team_id']),function($query){
-                return $query->where('team_id', $_GET['team_id']);
-             })
-            ->when(!empty($_GET['filter_by']),function($query){
-                return $query->where($_GET['filter_by'], 'like',  '%'.$_GET['keyword'].'%');
-             })
-            ->whereBetween('tickets.created_at', [$tgl_pertama.' 00:00:00', $tgl_terakhir.' 23:59:59'])
-            ->orderby('tickets.created_at','desc')->get();
+            ->when($request->filled('team_id'), function ($query) use ($request) {
+                $query->where('team_id', $request->team_id);
+            })
+            ->when($request->filled('filter_by') && $request->filled('keyword'), function ($query) use ($request) {
+                $query->where($request->filter_by, 'like', '%' . $request->keyword . '%');
+            })
+            ->whereBetween('tickets.created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59'])
+            ->orderby('tickets.created_at', 'desc')
+            ->paginate($length); // 4. Gunakan variabel $length di sini
 
-
-        return view('ticket.summary-report')
-        ->with('tickets',$tickets);
+        // Format JSON sudah benar dan tidak perlu diubah
+        return response()->json([
+            "draw" => intval($request->input('draw')),
+            "recordsTotal" => $paginatedTickets->total(),
+            "recordsFiltered" => $paginatedTickets->total(),
+            "data" => $paginatedTickets->items()
+        ]);
     }
 }

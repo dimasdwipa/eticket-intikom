@@ -1,4 +1,4 @@
-@extends('layouts.app', ['page' => 'SLA Report', 'pageSlug' => 'SLA Report', 'section' => 'SLA Report'])
+@extends('layouts.app', ['page' => 'Detail of Loan Item Movement', 'pageSlug' => 'Detail of Loan Item Movement', 'section' => 'Detail of Loan Item Movement'])
 
 @section('content')
 <div class="container-fluid py-4">
@@ -8,7 +8,7 @@
             <div class="card my-4">
                 <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
                     <div class="bg-gradient-primary shadow-primary border-radius-lg pt-2 pb-1">
-                        <h6 class="text-white text-capitalize ps-3">SLA Report</h6>
+                        <h6 class="text-white text-capitalize ps-3">Ticket Detailed Report</h6>
                     </div>
                 </div>
                 <div class="card-body px-0 pb-2">
@@ -170,7 +170,7 @@
                                     <td>{{ date_format(date_create($item->created_at), 'd-M-y') }}</td>
                                     <td>{{ $item->user->name ?? '' }}</td>
                                     <td>
-                                        {{ $item->lokasiAllTeams->lokasi }}
+                                        {{ $item->lokasiAllTeams->lokasi ??'-' }}
                                     </td>
                                     <td>{{ $item->bu }}</td>
                                     <td>
@@ -324,7 +324,7 @@
                                             Very satisfied
                                         @endif
                                     </td>
-                                 
+
                                         <td>
                                             <div class="btn-group btn-group-sm" role="group">
                                                 <a class="btn btn-sm btn-outline-info m-0 p-1"
@@ -337,7 +337,7 @@
                                                 </a>
                                             </div>
                                         </td>
-                               
+
                                     <td>
                                         {{ $item->prioritas }}
                                     </td>

@@ -2,16 +2,16 @@
 
 @section('content')
     <div class="new-wrap" style="display: none;">
-        <div class="card bg-gray-700  my-4">
+        <div class="card bg-gray-500  my-4">
             <div class="p-0 position-relative mt-n4 mx-3 z-index-2 border-radius-lg ps p-3 row">
 
                 <h6
                     class="col-10 col-sm-6 col-md-4 col-lg-4 col-xl-3 bg-gradient-primary shadow-primary border-radius-lg pt-1 pb-1 text-white text-capitalize ps-3">
                     Problem / Request <span class="ticket_nbr"></span></h6>
             </div>
-            <div class="card-body bg-gray-500">
+            <div class="card-body bg-white">
                 <div class="input-group input-group-static mb-4">
-                    <label for="Lokasi">Send To</label>
+                    <label for="Lokasi" class="text-dark">Send To</label>
                     <select class="form-control form-control-sm tenant33" name="team_id[]" onchange="getCombo2(this)" required>
                         <option></option>
                         @foreach ($teams as $item)
@@ -20,7 +20,7 @@
                     </select>
                 </div>
                 <div class="input-group input-group-static mb-4">
-                    <label for="Lokasi">Location</label>
+                    <label for="Lokasi " class="text-dark">Location</label>
                     <select class="form-control lokasi" name="lokasi[]" required>
                         <option></option>
                         @foreach ($lokasi as $item)
@@ -93,21 +93,21 @@
 
 
                         <div class="input-group input-group-static mb-4">
-                            <label for="Lokasi">Date</label>
+                            <label for="Lokasi" class="text-dark">Date</label>
                             <input type="text" class="form-control" autocomplete="off" name="tanggal" value="{{ date('Y-m-d') }}" readonly
                                 aria-describedby="helpId" required>
                         </div>
                         <div class="mainform">
-                            <div class="card bg-gray-700">
+                            <div class="card bg-gray-500 ">
                                 <div class="p-0 position-relative mt-n4 mx-3 z-index-2 border-radius-lg ps p-3 row">
 
                                     <h6
                                         class="col-10 col-sm-6 col-md-4 col-lg-4 col-xl-3 bg-gradient-primary shadow-primary border-radius-lg pt-1 pb-1 text-white text-capitalize ps-3">
                                         Problem / Request ( #Ticket )</h6>
                                 </div>
-                                <div class="card-body bg-gray-500">
+                                <div class="card-body bg-white border-2 rounded border border-dark">
                                     <div class="input-group input-group-static mb-4">
-                                        <label for="Lokasi">Send To</label>
+                                        <label for="Lokasi" class="text-dark">Send To</label>
                                         <select class="form-control form-control-sm tenant33"  datateam="0" name="team_id[]" onchange="getCombo2(this)" required>
                                             <option></option>
                                             @foreach ($teams as $item)
@@ -116,7 +116,7 @@
                                         </select>
                                     </div>
                                     <div class="input-group input-group-static mb-4">
-                                        <label for="Lokasi">Location</label>
+                                        <label for="Lokasi" class="text-dark">Location</label>
                                         <select class="form-control lokasi" name="lokasi[]" lokasi="0" required>
                                             <option></option>
                                             @foreach ($lokasi as $item)
@@ -169,7 +169,7 @@
                         </div>
                         <div class="card-footer px-0" style="text-align: right">
                             <button type="button" class="add btn btn-sm btn-success text-white"><i class="fa fa-plus"
-                                    aria-hidden="true"></i> Add Prablem</button>
+                                    aria-hidden="true"></i> Add Problem</button>
                         </div>
 
                     </div>

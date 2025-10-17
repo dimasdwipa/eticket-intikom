@@ -329,7 +329,7 @@
                 @foreach ( Auth::user()->teams as $item )
 
                         @if($item->code == 'SA'  )
-                            <div class="col-lg-3 col-sm-3" style="cursor: pointer">
+                            {{-- <div class="col-lg-3 col-sm-3" style="cursor: pointer">
                                 <a href="{{route('homeuser', $item->id)}}">
                                     <div class="item"> <span class="icon feature_box_col_one"><i class="fas fa-file-contract"></i></span>
                                         <h6>Sales Admin Ticket</h6>
@@ -339,11 +339,11 @@
                             <?php $sales=true; ?>
                             @if($sales&&$normal)
                                 @break;
-                            @endif
+                            @endif --}}
                         @elseif(!$normal)
                             <div class="col-lg-3 col-sm-3" style="cursor: pointer">
                                 <a href="{{route('homeuser', $item->id)}}">
-                                    <div class="item"> 
+                                    <div class="item">
                                         <span class="icon feature_box_col_two"><i class="fas fa-ticket-alt"></i></span>
                                         <h6>Normal Ticket</h6>
                                     </div>
@@ -355,8 +355,8 @@
                             @endif
                         @endif
                     @endforeach
-                
-                
+
+
             </div>
         </div>
     </div>

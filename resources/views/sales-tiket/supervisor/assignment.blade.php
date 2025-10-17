@@ -7,9 +7,10 @@
             <div class="col-12">
                 <div class="card my-4">
                     <div class="card-header p-0 position-relative mt-n1 mx-3 z-index-2">
-                        <div class="icon icon-shape bg-gradient-warning shadow-info text-center border-radius-xl mt-n3 position-absolute">
-                        <i class="material-icons opacity-10">directions_run</i>
-                    </div>
+                        <div
+                            class="icon icon-shape bg-gradient-warning shadow-info text-center border-radius-xl mt-n3 position-absolute">
+                            <i class="material-icons opacity-10">directions_run</i>
+                        </div>
                     </div>
                     <div class="card-body px-0 py-5 pb-2">
                         <div class="table-responsive ">
@@ -48,14 +49,14 @@
                                     @foreach ($agents as $item)
                                         <tr>
                                             <td>{{ $item->name }}</td>
-                                            <td>{{$item->tickets->where('status','Awaiting Response')->count()}}</td>
-                                            <td>{{$item->tickets->where('status','On Progress')->count()}}</td>
-                                            <td>{{$item->tickets->where('status','Repairing')->count()}}</td>
-                                            <td>{{$item->tickets->where('status','Overdue')->count()}}</td>
-                                            <td>{{$item->tickets->where('status','Resolved')->count()}}</td>
-                                            <td>{{$item->tickets->where('status','Closed')->count()}}</td>
-                                            <td>{{$item->tickets->where('status','Pending')->count()}}</td>
-                                            <td>{{$item->tickets->count()}}</td>
+                                            <td>{{ $item->tickets->where('status', 'Awaiting Response')->count() }}</td>
+                                            <td>{{ $item->tickets->where('status', 'On Progress')->count() }}</td>
+                                            <td>{{ $item->tickets->where('status', 'Repairing')->count() }}</td>
+                                            <td>{{ $item->tickets->where('status', 'Overdue')->count() }}</td>
+                                            <td>{{ $item->tickets->where('status', 'Resolved')->count() }}</td>
+                                            <td>{{ $item->tickets->where('status', 'Closed')->count() }}</td>
+                                            <td>{{ $item->tickets->where('status', 'Pending')->count() }}</td>
+                                            <td>{{ $item->tickets->count() }}</td>
 
                                         </tr>
                                     @endforeach
@@ -116,7 +117,6 @@
                                 </thead>
                                 <tbody>
                                     @foreach ($tickets as $item)
-
                                         <tr>
 
 
@@ -131,21 +131,33 @@
                                             <td class="text-center">
                                                 <button type="button" class="btn btn-sm btn-outline-info m-0 p-1"
                                                     style="width: 5rem" data-bs-toggle="modal" data-bs-target="#Detail"
-                                                    data-problem="{{ $item->problem }}" >Detail</button>
+                                                    data-problem="{{ $item->problem }}">Detail</button>
                                             </td>
                                             <td>
                                                 <select class="form-control prioritas prioritas" name="prioritas" required>
-                                                    <option  @if ($item->prioritas=='low') selected @endif  value="low">Low</option>
-                                                    <option  @if ($item->prioritas=='normal') selected @endif  value="normal">Normal</option>
-                                                    <option  @if ($item->prioritas=='high') selected @endif  value="high">High</option>
-                                                    <option  @if ($item->prioritas=='urgent') selected @endif  value="urgent">Urgent</option>
+                                                    <option @if ($item->prioritas == 'low') selected @endif
+                                                        value="low">Low</option>
+                                                    <option @if ($item->prioritas == 'normal') selected @endif
+                                                        value="normal">Normal</option>
+                                                    <option @if ($item->prioritas == 'high') selected @endif
+                                                        value="high">High</option>
+                                                    <option @if ($item->prioritas == 'urgent') selected @endif
+                                                        value="urgent">Urgent</option>
                                                 </select>
                                             </td>
                                             <td>
                                                 <select class="form-control agent agent_id" name="agent_id" required>
                                                     <option></option>
                                                     @foreach ($agents as $value)
-                                                        <option @if ($value->id==$item->agent_id) selected @endif @if ($value->permission=="Non Active")  disabled @endif value="{{ $value->id }}"> @if($value->permission=="Non Active") {{ $value->name }} ( leave ) @else {{ $value->name }} @endif</option>
+                                                        <option @if ($value->id == $item->agent_id) selected @endif
+                                                            @if ($value->permission == 'Non Active') disabled @endif
+                                                            value="{{ $value->id }}">
+                                                            @if ($value->permission == 'Non Active')
+                                                                {{ $value->name }} ( leave )
+                                                            @else
+                                                                {{ $value->name }}
+                                                            @endif
+                                                        </option>
                                                     @endforeach
                                                 </select>
                                             </td>
@@ -157,9 +169,10 @@
                                                 </div>
                                             </td>
                                             <td class="text-center">
-                                                <input type="hidden" name="id" class="dataID" value="{{ $item->id }}">
-                                                <button type="button"  class="btn btn-sm btn-warning m-0 p-1 UpdateButton" id="#UpdateButton"
-                                                style="width: 5rem" >Submit</button>
+                                                <input type="hidden" name="id" class="dataID"
+                                                    value="{{ $item->id }}">
+                                                <button type="button" class="btn btn-sm btn-warning m-0 p-1 UpdateButton"
+                                                    id="#UpdateButton" style="width: 5rem">Submit</button>
                                             </td>
                                         </tr>
                                     @endforeach
@@ -171,7 +184,7 @@
             </div>
         </div>
     </div>
-    <form action="{{ route('supervisor.store') }}" style="display: none" method="post" id="FormAction" >
+    <form action="{{ route('supervisor.store') }}" style="display: none" method="post" id="FormAction">
         @csrf
         <input type="text" name="id" id="id">
         <input type="text" name="agent_id" id="agent_id">
@@ -183,11 +196,11 @@
 @push('style')
     {{-- data table --}}
     <style>
-
-        [aria-disabled="true"]{
+        [aria-disabled="true"] {
             background-image: linear-gradient(195deg, #747b8a 0%, #495361 100%);
-         color:#fff!important;
+            color: #fff !important;
         }
+
         .dt-buttons {
             text-align: right;
             padding-left: 1rem;
@@ -403,22 +416,34 @@
                     },
                     {
                         extend: 'excelHtml5',
+                        exportOptions: {
+                            columns: ':not(:contains("Action"))'
+                        },
                         footer: true,
                         className: 'btn btn-sm btn-success shadow rounded'
                     },
                     {
                         extend: 'csvHtml5',
+                        exportOptions: {
+                            columns: ':not(:contains("Action"))'
+                        },
                         footer: true,
                         className: 'btn btn-sm btn-success shadow rounded'
                     },
                     {
                         extend: 'pdfHtml5',
+                        exportOptions: {
+                            columns: ':not(:contains("Action"))'
+                        },
                         footer: true,
                         orientation: 'landscape',
                         className: 'btn btn-sm btn-success shadow rounded'
                     },
                     {
                         extend: 'print',
+                        exportOptions: {
+                            columns: ':not(:contains("Action"))'
+                        },
                         footer: true,
                         orientation: 'landscape',
                         className: 'btn btn-sm btn-success shadow rounded',
@@ -454,19 +479,19 @@
                 "paging": true,
                 "bAutoWidth": false,
                 initComplete: function() {
-                $(this).on('draw.dt', function() {
-                    $(document).ready(function() {
-                        $('.agent').select2({
-                        tags: true,
-                        placeholder: "Select Agent",
-                        width: '100%',
-                        });
+                    $(this).on('draw.dt', function() {
+                        $(document).ready(function() {
+                            $('.agent').select2({
+                                tags: true,
+                                placeholder: "Select Agent",
+                                width: '100%',
+                            });
 
-                        $('.prioritas').select2({
-                        tags: true,
-                        width: '100%',
-                        minimumResultsForSearch: -1
-                        });
+                            $('.prioritas').select2({
+                                tags: true,
+                                width: '100%',
+                                minimumResultsForSearch: -1
+                            });
 
 
                         });
@@ -475,23 +500,23 @@
             });
             $('.tableku2').DataTable({
                 initComplete: function() {
-                $(this).on('draw.dt', function() {
-                    $(document).ready(function() {
-                        $('.agent').select2({
-                        tags: true,
-                        placeholder: "Select Agent",
-                        width: '100%',
+                    $(this).on('draw.dt', function() {
+                        $(document).ready(function() {
+                            $('.agent').select2({
+                                tags: true,
+                                placeholder: "Select Agent",
+                                width: '100%',
 
-                    });
-                    $('.prioritas').select2({
-                        tags: true,
-                        width: '100%',
-                        minimumResultsForSearch: -1
-                    });
+                            });
+                            $('.prioritas').select2({
+                                tags: true,
+                                width: '100%',
+                                minimumResultsForSearch: -1
+                            });
 
+                        });
                     });
-                });
-            },
+                },
                 dom: 'Blfrtip',
                 "order": [],
                 "showNEntries": true,
@@ -502,22 +527,34 @@
                     },
                     {
                         extend: 'excelHtml5',
+                        exportOptions: {
+                            columns: ':not(:contains("Action"))'
+                        },
                         footer: true,
                         className: 'd-none btn btn-sm btn-success shadow rounded'
                     },
                     {
                         extend: 'csvHtml5',
+                        exportOptions: {
+                            columns: ':not(:contains("Action"))'
+                        },
                         footer: true,
                         className: 'd-none btn btn-sm btn-success shadow rounded'
                     },
                     {
                         extend: 'pdfHtml5',
+                        exportOptions: {
+                            columns: ':not(:contains("Action"))'
+                        },
                         footer: true,
                         orientation: 'landscape',
                         className: 'd-none btn btn-sm btn-success shadow rounded'
                     },
                     {
                         extend: 'print',
+                        exportOptions: {
+                            columns: ':not(:contains("Action"))'
+                        },
                         footer: true,
                         orientation: 'landscape',
                         className: 'd-none btn btn-sm btn-success shadow rounded',
@@ -587,7 +624,7 @@
 
             $('#Detail').on('show.bs.modal', function(event) {
                 var button = $(event.relatedTarget)
-                var problem = button.data('problem')// E// Extract info from data-* attributes
+                var problem = button.data('problem') // E// Extract info from data-* attributes
                 // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
                 // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
                 var modal = $(this)
@@ -621,14 +658,14 @@
         //     })
         // });
 
-        $(document).ready(function () {
-            $('table.tableku').on('click','Button.UpdateButton', function (e) {
+        $(document).ready(function() {
+            $('table.tableku').on('click', 'Button.UpdateButton', function(e) {
 
                 var row = $(this).closest('tr'),
-                agent_id = $('.agent_id', row),
-                prioritas = $('.prioritas', row),
-                dataID = $('.dataID', row),
-                sla_ticket_time = $('.sla_ticket_time', row);
+                    agent_id = $('.agent_id', row),
+                    prioritas = $('.prioritas', row),
+                    dataID = $('.dataID', row),
+                    sla_ticket_time = $('.sla_ticket_time', row);
 
 
                 $('#id').val(dataID.val());

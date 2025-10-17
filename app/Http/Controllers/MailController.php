@@ -138,7 +138,7 @@ class MailController extends Controller
         $notification = new DataNotification($title,$ticket->problem,$url_user);
         $User->notify($notification);
 
-       
+
         Mail::to($User->email)
         ->cc($email_cc)
         ->send(new CloseSysTicketEmail($ticket,$User,"eTicketing ".(Team::find($ticket->team_id)->name)." - Penutupan ticket #".$ticket->code));
@@ -669,7 +669,7 @@ class MailController extends Controller
 
             $ticket=Complain::find($id);
 
-          
+
             // Email cc to user
             // $User=User::find($ticket->user_id);
             // array_push($email_cc,$Supervisor->email);
@@ -679,7 +679,7 @@ class MailController extends Controller
 
              $title="Permintaan ticket sudahh direspon";
              $url_agent=url("agent/create?start_date=&end_date=&filter_by=code&keyword=".$ticket->code);
-       
+
              $notification = new DataNotification($title,$ticket->comment,$url_agent);
              $Agent->notify($notification);
            //  array_push($email_cc,$Agent->email);
@@ -690,7 +690,7 @@ class MailController extends Controller
             // $Supervisor=User::find($ticket->ticket->supervisor_id);
 
             // }
-        
+
 
            // Email cc to Manager
            // $Manager=User::where("role","=","manager")->get();
@@ -729,33 +729,39 @@ class MailController extends Controller
 
         // Email to Supervisor
         foreach ($tickets->groupBy('supervisor_id') as $ticket){
+             $data_ticket = $ticket->first() ?? $ticket;
 
-            $Supervisor=User::find($ticket->first()->supervisor_id);
+             $Supervisor=User::find($data_ticket->supervisor_id);
+             $title="Tickets Overdue #".$data_ticket->code;
 
-             $title="Tickets Overdue #".$ticket->code;
-             $url_supervisor=url("summary-report-sumpervisor-sla?start_date=&end_date=&filter_by=code&keyword=".$ticket->code);
 
-             $notification = new DataNotification($title,$ticket->problem,$url_supervisor);
+             $url_supervisor=url("summary-report-sumpervisor-sla?start_date=&end_date=&filter_by=code&keyword=".$data_ticket->code);
+
+
+             $notification = new DataNotification($title,$data_ticket->problem,$url_supervisor);
              $Supervisor->notify($notification);
 
             Mail::to($Supervisor->email)
             ->cc($email_cc)
-            ->send(new NotifOverdueEmail($ticket,$Supervisor,"eTicketing ".(Team::find($ticket->team_id)->name??'')." - Tickets Overdue"));
+            ->send(new NotifOverdueEmail($ticket,$Supervisor,"eTicketing ".(Team::find($data_ticket->team_id)->name??'')." - Tickets Overdue"));
         }
 
         // Email cc to Agent
 
         foreach ($tickets->groupBy('agent_id') as $ticket){
-            $Agent=User::find($ticket->first()->agent_id);
 
-            $title="Tickets Overdue #".$ticket->code;
-            $url_agent=url("my-ticket?start_date=&end_date=&filter_by=code&keyword=".$ticket->code);
+            $data_ticket = $ticket->first() ?? $ticket;
 
-            $notification = new DataNotification($title,$ticket->problem,$url_agent);
+            $Agent=User::find($data_ticket->agent_id);
+
+            $title="Tickets Overdue #".$data_ticket->code;
+            $url_agent=url("my-ticket?start_date=&end_date=&filter_by=code&keyword=".$data_ticket->code);
+
+            $notification = new DataNotification($title,$data_ticket->problem,$url_agent);
             $Agent->notify($notification);
 
             Mail::to($Agent->email)
-            ->send(new NotifOverdueEmail($ticket,$Agent,"eTicketing ".(Team::find($ticket->team_id)->name??'')." - Your Tickets Overdue"));
+            ->send(new NotifOverdueEmail($ticket,$Agent,"eTicketing ".(Team::find($data_ticket->team_id)->name??'')." - Your Tickets Overdue"));
         }
 
         return 200;
@@ -783,7 +789,7 @@ class MailController extends Controller
         if(!$Manager->isEmpty()){
             Mail::to($Manager->first()->email)
             ->cc($email_cc)
-            ->send(new NotifMasterDataEmail($old,$new,$type,$master,$Manager->first(),"eTicketing ".(Team::find($ticket->team_id)->name??'')." - Change masterdata"));
+            ->send(new NotifMasterDataEmail($old,$new,$type,$master,$Manager->first(),"eTicketing ".(Team::find($Manager->first()->team_id)->name??'')." - Change masterdata"));
 
         }
 

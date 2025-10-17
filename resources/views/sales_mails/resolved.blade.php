@@ -14,7 +14,7 @@
     </tr>
     <tr>
         <td>
-            <div style="text-align:left;padding-bottom:10px">Making SO {{$data->sub_katagori->sub_kategori}} for ticket no. : {{$data->code}} date : {{$data->tanggal}}</div>
+            <div style="text-align:left;padding-bottom:10px">Making {{$data->sub_katagori->sub_kategori}} for ticket no. : {{$data->code}} date : {{$data->tanggal}}</div>
         </td>
     </tr>
     <tr>
@@ -26,7 +26,7 @@
 <table border="0" align="center" cellpadding="0" cellspacing="0" width="100%" style="width:100%;max-width:100%;color:#000000;">
     <tr>
         <td>
-            <div style="text-align:left;padding-bottom:10px">This Ticket has been completed and the result is SO {{$data->sub_katagori->sub_kategori}} No. : {{$data->doc_no}}, date : {{$data->date_finish}}</div>
+            <div style="text-align:left;padding-bottom:10px">This Ticket has been completed and the result is {{$data->sub_katagori->sub_kategori}} No. : {{$data->doc_no}}, date : {{$data->date_finish}}</div>
         </td>
     </tr>
     <tr>

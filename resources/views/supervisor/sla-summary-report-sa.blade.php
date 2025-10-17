@@ -1,4 +1,4 @@
-@extends('layouts.app', ['page' => 'SLA Report Sales Admin', 'pageSlug' => 'SLA Report Sales Admin', 'section' => 'SLA Report Sales Admin'])
+@extends('layouts.app', ['page' => 'Ticket Detailed Report Sales Admin', 'pageSlug' => 'Ticket Detailed Report Sales Admin', 'section' => 'Ticket Detailed Report Sales Admin'])
 
 @section('content')
 <div class="container-fluid py-4">
@@ -8,7 +8,7 @@
             <div class="card my-4">
                 <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
                     <div class="bg-gradient-primary shadow-primary border-radius-lg pt-2 pb-1">
-                        <h6 class="text-white text-capitalize ps-3">SLA Report Sales Admin</h6>
+                        <h6 class="text-white text-capitalize ps-3">Ticket Detailed Report Sales Admin</h6>
                     </div>
                 </div>
                 <div class="card-body px-0 pb-2">
@@ -44,7 +44,7 @@
                                         style="min-width: 6rem">
                                         Ref. No
                                     </th>
-                                    
+
                                     <th class="text-uppercase text-secondary text-xs font-weight-bolder text-center  ps-3"
                                         style="min-width: 30rem">
                                         Description

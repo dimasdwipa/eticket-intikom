@@ -46,7 +46,7 @@ class SupervisorController extends Controller
     public function index()
     {
 
-        $tickets_icon=Ticket::whereBetween('created_at',[Carbon::now()->subYear(), Carbon::now()])
+        $tickets_icon=Ticket::whereBetween('created_at',[ Carbon::now()->startOfYear(), Carbon::now()])
         // ->when(!empty($_GET['status']),function($query){
         //     if($_GET['status']!='Overdue'){
         //         return $query->where('status', 'On Progress')
@@ -58,11 +58,12 @@ class SupervisorController extends Controller
         //  })
         ->orderby('created_at','desc')->get();
 
-        $tickets = Ticket::whereBetween('created_at',[Carbon::now()->subYear(), Carbon::now()])
+        $tickets = Ticket::whereBetween('created_at',[ Carbon::now()->startOfYear(), Carbon::now()])
         ->when(!empty($_GET['status']),function($query){
             if($_GET['status']!='Overdue'){
                 return $query->where('status', 'On Progress')
-                ->whereRaw('DATE_ADD(sla_respone , interval sla_ticket_time MINUTE) < now()')
+                // ->whereRaw('DATE_ADD(sla_respone , interval sla_ticket_time MINUTE) < now()')
+                ->whereRaw('DATEADD(MINUTE, sla_ticket_time, sla_respone) < GETDATE()')
                 ->whereNotNull('sla_respone');
             }else{
                 return $query->where('status', $_GET['status']);
@@ -70,7 +71,7 @@ class SupervisorController extends Controller
          })
         ->where('status','!=','Closed')
         ->orderby('created_at', 'desc')->get();
-        
+
         $agents = User::GetTeam()
         ->where(function($query){
             $query->where('role','supervisor-agent')
@@ -78,7 +79,7 @@ class SupervisorController extends Controller
             ->orwhere('role','agent')
             ->orwhere('role','agent-user');
         })
-       
+
             ->orderby('name', 'asc')
             ->get();
         return view('supervisor.home')
@@ -95,7 +96,7 @@ class SupervisorController extends Controller
     public function assignment()
     {
         $hari_ini = date("Y-m-d");
-        $tgl_pertama = date('Y-m-t', strtotime(date("Y-m-d", strtotime($hari_ini)) . " - 365 day"));
+        $tgl_pertama = date('Y-01-01', strtotime($hari_ini));
         $tgl_terakhir = date('Y-m-t', strtotime($hari_ini));
 
         if (!empty($_GET['start_date'])) {
@@ -125,7 +126,7 @@ class SupervisorController extends Controller
             ->orwhere('role','agent')
             ->orwhere('role','agent-user');
         })
-        
+
             ->orderby('name', 'asc')
             ->get();
         return view('supervisor.assignment')
@@ -145,10 +146,14 @@ class SupervisorController extends Controller
             ->orderby('name', 'asc')
             ->get();
 
+        $user = User::orderby('name', 'asc')
+                ->get();
+
         return view('supervisor.create')
             ->with('lokasi', Lokasi::orderby('created_at','desc')->get())
             ->with('kategori', Kategori::orderby('created_at','desc')->get())
             ->with('agents', $agents)
+            ->with('user', $user)
             ->with('subkategori', SubKategori::orderby('created_at','desc')->get());
     }
 
@@ -183,7 +188,7 @@ class SupervisorController extends Controller
                 $data->tanggal = $request->tanggal;
                 $data->bu = $request->bu;
                 $data->lokasi_id = $request->lokasi;
-                $data->user_id = Auth::user()->id;
+                $data->user_id = !empty($request->user_id[$key]) ? $request->user_id[$key]  :  Auth::user()->id;
                 $data->supervisor_id = Auth::user()->id;
                 $data->katagori_id = $request->katagori[$key];
                 $data->sub_katagori_id = $request->subkategori[$key];
@@ -195,6 +200,7 @@ class SupervisorController extends Controller
                 $data->sla_response_time=$sk->extend_response_SLA_default;
                 $data->sla_assignment = now();
                 $data->status = 'Awaiting Response';
+                $data->send_mail = $request->send_mail == "false" ? 0:1;
 
                 try {
                     $data->files=$code.$key.'.'.$request->file('files')[$key]->extension() ??null;
@@ -207,7 +213,7 @@ class SupervisorController extends Controller
 
 
                 if($file_data){
-                    Storage::putFileAs("public/files/tickets",$request->file('files')[$key],$code.$key.'.'.$request->file('files')[$key]->extension());
+                    $filePath = Storage::putFileAs("public/files/tickets",$request->file('files')[$key],$code.$key.'.'.$request->file('files')[$key]->extension());
                  }
 
 
@@ -222,9 +228,10 @@ class SupervisorController extends Controller
                 $complain->approve=null;
                 $complain->save();
 
-
-                $email=new MailController();
-                $email->actionticket($data->id,"task");
+                if ($request->send_mail=="on") {
+                    $email=new MailController();
+                    $email->actionticket($data->id,"task");
+                }
 
             }
 
@@ -331,7 +338,7 @@ class SupervisorController extends Controller
     public function report()
     {
         $hari_ini = date("Y-m-d");
-        $tgl_pertama = date('Y-m-t', strtotime(date("Y-m-d", strtotime($hari_ini)) . " - 365 day"));
+        $tgl_pertama = date('Y-01-01', strtotime($hari_ini));
         $tgl_terakhir = date('Y-m-t', strtotime($hari_ini));
 
         if (!empty($_GET['start_date'])) {
@@ -411,7 +418,7 @@ class SupervisorController extends Controller
     public function request_extend()
     {
         $hari_ini = date("Y-m-d");
-        $tgl_pertama = date('Y-m-t', strtotime(date("Y-m-d", strtotime($hari_ini)) . " - 365 day"));
+        $tgl_pertama = date('Y-01-01', strtotime($hari_ini));
         $tgl_terakhir = date('Y-m-t', strtotime($hari_ini));
 
         if (!empty($_GET['start_date'])) {
@@ -466,7 +473,7 @@ class SupervisorController extends Controller
     public function complain()
     {
         $hari_ini = date("Y-m-d");
-        $tgl_pertama = date('Y-m-t', strtotime(date("Y-m-d", strtotime($hari_ini)) . " - 365 day"));
+        $tgl_pertama = date('Y-01-01', strtotime($hari_ini));
         $tgl_terakhir = date('Y-m-t', strtotime($hari_ini));
 
         if (!empty($_GET['start_date'])) {
@@ -514,14 +521,14 @@ class SupervisorController extends Controller
 
         try {
             DB::beginTransaction();
-          
+
             $data = Complain::find($request->id);
 
 
             if ($request->resolution == "aproved") {
                 $data->approve = "aproved";
                 $data->save();
-            
+
                 $data2 = Ticket::find($data->ticket_id);
 
                 if ($data->status == "Request Close") {
@@ -541,10 +548,13 @@ class SupervisorController extends Controller
                     $data2->estimation_date = Carbon::create($data2->sla_respone)->addMinutes($data2->sla_ticket_time);
                 }elseif ($data->status == "Unable Respond") {
                     $data2->sla_response_time = $data2->sla_response_time + $data->extend_response_SLA;
+                }elseif ($data->status == "Reassign") {
+                    $data2->agent_id = $request->sales_admin;
                 }
-        
+
+                $data2->req_status=null;
                 $data2->save();
-            
+
                 $data3 = new Complain();
                 $data3->ticket_id = $data->ticket_id;
                 $data3->supervisor_id = Auth::id();
@@ -558,7 +568,7 @@ class SupervisorController extends Controller
 
                 DB::commit();
 
-             
+
                 $email=new MailController();
                 $email->actionticket($data->id,"Supervisor approval");
                 return back()->with('Success', 'Request have been successfully approved.');
@@ -566,6 +576,11 @@ class SupervisorController extends Controller
 
                 $data->approve = "Rejected";
                 $data->save();
+
+
+                $data2 = Ticket::find($data->ticket_id);
+                $data2->req_status=null;
+                $data2->save();
 
                 $data3 = new Complain();
                 $data3->ticket_id = $data->ticket_id;
@@ -596,7 +611,7 @@ class SupervisorController extends Controller
     public function sla_report()
     {
         $hari_ini = date("Y-m-d");
-        $tgl_pertama = date('Y-m-t', strtotime(date("Y-m-d", strtotime($hari_ini)) . " - 365 day"));
+        $tgl_pertama = date('Y-01-01', strtotime($hari_ini));
         $tgl_terakhir = date('Y-m-t', strtotime($hari_ini));
 
         if (!empty($_GET['start_date'])) {
@@ -640,7 +655,7 @@ class SupervisorController extends Controller
     public function sla_report_sa()
     {
         $hari_ini = date("Y-m-d");
-        $tgl_pertama = date('Y-m-t', strtotime(date("Y-m-d", strtotime($hari_ini)) . " - 365 day"));
+        $tgl_pertama = date('Y-01-01', strtotime($hari_ini));
         $tgl_terakhir = date('Y-m-t', strtotime($hari_ini));
 
         if (!empty($_GET['start_date'])) {
@@ -658,7 +673,7 @@ class SupervisorController extends Controller
                 return $query->where($_GET['filter_by'], 'like',  '%' . $_GET['keyword'] . '%');
             })
             ->whereBetween('tickets.created_at', [$tgl_pertama . ' 00:00:00', $tgl_terakhir . ' 23:59:59'])
-            // ->where('tickets.status','!=','Open')
+            ->where('tickets.team_id','=',2)
             ->orderby('tickets.created_at', 'desc')->get();
 
 

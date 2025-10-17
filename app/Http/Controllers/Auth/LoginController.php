@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use LdapRecord\Models\ActiveDirectory\User;
 use LdapRecord\Laravel\Auth\ListensForLdapBindFailure;
 use Dcblogdev\MsGraph\Facades\MsGraph;
+use Illuminate\Support\Facades\Auth;
 
 
 // use LdapRecord\Models\OpenLDAP\User;
@@ -65,6 +66,12 @@ class LoginController extends Controller
     }
     public function logout()
     {
+        
+        if (env('APP_TEST')) {
+            Auth::logout();
+            return redirect()->route('login');
+ 
+         }
         return MsGraph::disconnect();
     }
 

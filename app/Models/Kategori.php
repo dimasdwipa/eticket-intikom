@@ -19,7 +19,7 @@ class Kategori extends Model
 
     public static $snakeAttributes = false;
     protected $fillable = [
-        'katagori'
+        'kategori'
     ];
 
     public function ticket()

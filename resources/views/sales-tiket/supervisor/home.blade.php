@@ -256,7 +256,9 @@
                                             <td>{{$item->tickets->where('status','Awaiting Update')->count()}}</td>
                                             <td>{{$item->tickets->where('status','Re Prosess')->count()}}</td>
                                             <td>{{$item->tickets->where('status','Resolved')->count()}}</td>
-                                            <td>{{$item->tickets()->where('status','On Progress')->whereRaw('DATE_ADD(sla_respone, INTERVAL sla_ticket_time MINUTE) < NOW()')->count()}}</td>
+                                            <td>{{$item->tickets()->where('status','On Progress')
+                                                ->whereRaw('DATEADD(MINUTE, sla_ticket_time, sla_respone) < GETDATE()')->count()}}
+                                            </td>
                                             <td>{{$item->tickets->count()}}</td>
                                         </tr>
                                     @endforeach

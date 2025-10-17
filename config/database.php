@@ -89,6 +89,15 @@ return [
             'charset' => 'utf8',
             'prefix' => '',
             'prefix_indexes' => true,
+            'strict' => true,
+            'engine' => null,
+            
+            // 'options' => extension_loaded('sqlsrv') || extension_loaded('pdo_sqlsrv')  ? array_filter([
+            //     PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            //     PDO::SQLSRV_ATTR_ENCODING => PDO::SQLSRV_ENCODING_UTF8,
+            //     // Aktifkan TrustServerCertificate jika SSL tidak digunakan
+            //     "TrustServerCertificate" => env('DB_TRUST_SERVER_CERTIFICATE', true),
+            // ]) : [],
         ],
 
     ],

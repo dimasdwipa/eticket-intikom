@@ -1,4 +1,4 @@
-@extends('layouts.app', ['page' => 'Update Tickets', 'pageSlug' => 'Update Tickets', 'section' => 'Update Tickets'])
+@extends('layouts.app', ['page' => 'Ticket Update', 'pageSlug' => 'Ticket Update', 'section' => 'Ticket Update'])
 
 @section('content')
 <div class="container-fluid py-4">
@@ -8,7 +8,7 @@
             <div class="card my-4">
                 <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
                     <div class="bg-gradient-primary shadow-primary border-radius-lg pt-2 pb-1">
-                        <h6 class="text-white text-capitalize ps-3">Update Tickets </h6>
+                        <h6 class="text-white text-capitalize ps-3">Ticket Update </h6>
                     </div>
                 </div>
                 <div class="card-body px-0 pb-2">
@@ -128,7 +128,7 @@
                                         style="min-width: 10rem">
                                         Status
                                     </th>
-                                   
+
                                 </tr>
                             </thead>
                             <tbody>
@@ -290,8 +290,8 @@
                                         </select>
                                         @endif
                                     </td>
-                                  
-                                  
+
+
                                 </tr>
                                 @endforeach
 
@@ -540,62 +540,11 @@
 <script>
     $(document).ready(function() {
         $('.tableku').DataTable({
-            dom: 'Blfrtip'
+            dom: 'lfrtip'
             , "order": []
             , "showNEntries": true
-            , buttons: [{
-                    text: 'filter'
-                    , footer: true
-                    , className: 'btn btn-sm btn-white btn-outline-primary shadow rounded filter'
-                }
-                , {
-                    extend: 'excelHtml5'
-                    , footer: true
-                    , className: 'btn btn-sm btn-success shadow rounded'
-                }
-                , {
-                    extend: 'csvHtml5'
-                    , footer: true
-                    , className: 'btn btn-sm btn-success shadow rounded'
-                }
-                , {
-                    extend: 'pdfHtml5'
-                    , footer: true
-                    , orientation: 'landscape'
-                    , className: 'btn btn-sm btn-success shadow rounded'
-                }
-                , {
-                    extend: 'print'
-                    , footer: true
-                    , orientation: 'landscape'
-                    , className: 'btn btn-sm btn-success shadow rounded',
-
-                    customize: function(win) {
-                        $(win.document.body).find('div.dataTables_wrapper').addClass('display')
-                            .html('text-align', 'center');
-
-                        //  $(win.document.body).find('div.dt-buttons').append('<button type="button" class="btn btn-sm btn-outline-primary"><i class="fas fa-filter"></i></button>');
-                        $(win.document.body).find('th').addClass('display').css('text-align'
-                            , 'center');
-                        $(win.document.body).find('th').addClass('display').css('color'
-                            , '#000000');
-
-
-                        $(win.document.body).find('table').addClass('display').css('font-size'
-                            , '16px');
-                        $(win.document.body).find('table').addClass('display').css('text-align'
-                            , 'center');
-                        $(win.document.body).find('tr:nth-child(odd) td').each(function(index) {
-                            // $(this).css('background-color', '#D0D0D0');
-                            $(this).css('color', '#000000');
-                        });
-                        $(win.document.body).find('h1').css('text-align', 'center');
-                        $(win.document.body).find('td').addClass('display').css('color'
-                            , '#000000 !important');
-                    }
-                }
-            ]
-            , language: {
+            ,
+             language: {
                 'search': '' /*Empty to remove the label*/
             }
             , "paging": true
@@ -630,62 +579,10 @@
             }
         , });
         $('.tableku2').DataTable({
-            dom: 'Blfrtip'
+            dom: 'lfrtip'
             , "order": []
             , "showNEntries": true
-            , buttons: [{
-                    text: 'filter'
-                    , footer: true
-                    , className: 'd-none btn btn-sm btn-white btn-outline-primary shadow rounded filter'
-                }
-                , {
-                    extend: 'excelHtml5'
-                    , footer: true
-                    , className: 'd-none btn btn-sm btn-success shadow rounded'
-                }
-                , {
-                    extend: 'csvHtml5'
-                    , footer: true
-                    , className: 'd-none btn btn-sm btn-success shadow rounded'
-                }
-                , {
-                    extend: 'pdfHtml5'
-                    , footer: true
-                    , orientation: 'landscape'
-                    , className: 'd-none btn btn-sm btn-success shadow rounded'
-                }
-                , {
-                    extend: 'print'
-                    , footer: true
-                    , orientation: 'landscape'
-                    , className: 'd-none btn btn-sm btn-success shadow rounded',
-
-                    customize: function(win) {
-                        $(win.document.body).find('div.dataTables_wrapper').addClass('display')
-                            .html('text-align', 'center');
-
-                        //  $(win.document.body).find('div.dt-buttons').append('<button type="button" class="btn btn-sm btn-outline-primary"><i class="fas fa-filter"></i></button>');
-                        $(win.document.body).find('th').addClass('display').css('text-align'
-                            , 'center');
-                        $(win.document.body).find('th').addClass('display').css('color'
-                            , '#000000');
-
-
-                        $(win.document.body).find('table').addClass('display').css('font-size'
-                            , '16px');
-                        $(win.document.body).find('table').addClass('display').css('text-align'
-                            , 'center');
-                        $(win.document.body).find('tr:nth-child(odd) td').each(function(index) {
-                            // $(this).css('background-color', '#D0D0D0');
-                            $(this).css('color', '#000000');
-                        });
-                        $(win.document.body).find('h1').css('text-align', 'center');
-                        $(win.document.body).find('td').addClass('display').css('color'
-                            , '#000000 !important');
-                    }
-                }
-            ]
-            , language: {
+            ,  language: {
                 'search': '' /*Empty to remove the label*/
             }
             , "paging": true

@@ -47,7 +47,7 @@
                                             class="text-center text-uppercase text-secondary text-xs font-weight-bolder  ps-3" width="10%">
                                             Action
                                         </th>
-                                       
+
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -95,9 +95,9 @@
                                                 <input type="hidden" name="id" class="dataID" value="{{ $item->id }}">
                                                 <button type="button"  class="btn btn-sm btn-success m-0 p-1 UpdateAgent"
                                                 style="width: 5rem" >Edit</button>
-                                               
+
                                             </td>
-                                           
+
                                         </tr>
                                     @endforeach
                                 </tbody>
@@ -196,54 +196,11 @@
                 "showNEntries": true,
                 buttons: [{
                         text: 'Filter',
+                        exportOptions: {
+                            columns: ':not(:contains("Action"))'
+                        },
                         footer: true,
                         className: 'btn btn-sm btn-white btn-outline-primary shadow rounded filter'
-                    },
-                    {
-                        extend: 'excelHtml5',
-                        footer: true,
-                        className: 'btn btn-sm btn-success shadow rounded'
-                    },
-                    {
-                        extend: 'csvHtml5',
-                        footer: true,
-                        className: 'btn btn-sm btn-success shadow rounded'
-                    },
-                    {
-                        extend: 'pdfHtml5',
-                        footer: true,
-                        orientation: 'landscape',
-                        className: 'btn btn-sm btn-success shadow rounded'
-                    },
-                    {
-                        extend: 'print',
-                        footer: true,
-                        orientation: 'landscape',
-                        className: 'btn btn-sm btn-success shadow rounded',
-
-                        customize: function(win) {
-                            $(win.document.body).find('div.dataTables_wrapper').addClass('display')
-                                .html('text-align', 'center');
-
-                            //  $(win.document.body).find('div.dt-buttons').append('<button type="button" class="btn btn-sm btn-outline-primary"><i class="fas fa-filter"></i></button>');
-                            $(win.document.body).find('th').addClass('display').css('text-align',
-                                'center');
-                            $(win.document.body).find('th').addClass('display').css('color',
-                                '#000000');
-
-
-                            $(win.document.body).find('table').addClass('display').css('font-size',
-                                '16px');
-                            $(win.document.body).find('table').addClass('display').css('text-align',
-                                'center');
-                            $(win.document.body).find('tr:nth-child(odd) td').each(function(index) {
-                                // $(this).css('background-color', '#D0D0D0');
-                                $(this).css('color', '#000000');
-                            });
-                            $(win.document.body).find('h1').css('text-align', 'center');
-                            $(win.document.body).find('td').addClass('display').css('color',
-                                '#000000 !important');
-                        }
                     }
                 ],
                 language: {

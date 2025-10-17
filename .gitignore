@@ -1,17 +1,27 @@
-# /node_modules
-# /public/hot
-# /public/storage
-# /storage/*.key
-# /vendor
-# .env
-# .env.backup
-# .phpunit.result.cache
-# docker-compose.override.yml
-# Homestead.json
-# Homestead.yaml
-# npm-debug.log
-# yarn-error.log
-# /.idea
-# /.vscode
-# config/ldap.php
-# composer.lock
+# Dependencies
+/node_modules
+/vendor
+
+# Laravel files
+/public/hot
+/public/storage
+/storage/*.key
+/.env
+/.env.backup
+/.phpunit.result.cache
+
+# Log files
+npm-debug.log
+yarn-error.log
+
+# Editor directories
+/.idea
+/.vscode
+
+# Environment specific files
+Homestead.json
+Homestead.yaml
+docker-compose.override.yml
+
+# Custom Ignored Files (Anda bisa tambahkan di sini jika ada)
+# Contoh: config/ldap.php

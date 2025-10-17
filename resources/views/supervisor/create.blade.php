@@ -38,6 +38,17 @@
                     </select>
                 </div>
                 <div class="input-group input-group-static mb-4">
+                    <label class="text-dark">User</label>
+                    <select class="form-control user user_id select88" name="user_id[]" >
+                        <option></option>
+                        @foreach ($user as $value)
+                            <option value="{{ $value->id }}">{{ $value->name }}</option>
+                        @endforeach
+                    </select>
+
+
+                </div>
+                <div class="input-group input-group-static mb-4">
                     <label class="text-dark">Priority</label>
                     <select class="form-control form-control-sm Priority23" id="prioritas0" name="prioritas[]" required>
                         <option class="prioritas0"  value="low">Low</option>
@@ -104,6 +115,11 @@
                             <input type="text" class="form-control" autocomplete="off" name="tanggal" id="tanggal" value="{{ date('Y-m-d') }}"
                                 aria-describedby="helpId" required>
                         </div>
+                        <div class="form-check form-switch">
+                            <input type="hidden" name="send_mail" value="false">
+                            <input class="form-check-input" type="checkbox" name="send_mail">
+                            <label class="form-check-label" for="OnlyAvailable">Send Mail Notifications</label>
+                        </div>
                         <div class="mainform">
                             <div class="card bg-gray-700">
                                 <div class="p-0 position-relative mt-n4 mx-3 z-index-2 border-radius-lg ps p-3 row">
@@ -142,6 +158,15 @@
                                         </select>
                                     </div>
                                     <div class="input-group input-group-static mb-4">
+                                        <label class="text-dark">User</label>
+                                        <select class="form-control user user_id select88" name="user_id[]" >
+                                            <option></option>
+                                            @foreach ($user as $value)
+                                                <option value="{{ $value->id }}">{{ $value->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <div class="input-group input-group-static mb-4">
                                         <label class="text-dark">Priority</label>
                                         <select class="form-control form-control-sm Priority23" id="prioritas0" name="prioritas[]" required>
                                             <option class="prioritas0"  value="low">Low</option>
@@ -170,7 +195,7 @@
                         </div>
                         <div class="card-footer px-0" style="text-align: right">
                             <button type="button" class="add btn btn-sm btn-success text-white"><i class="fa fa-plus"
-                                    aria-hidden="true"></i> Add Prablem</button>
+                                    aria-hidden="true"></i> Add Problem</button>
                         </div>
 
 
@@ -242,6 +267,13 @@
             });
 
             $('.mainform .select22').select2({
+                //-^^^^^^^^--- update here
+                tags: true,
+                placeholder: "Select an Option",
+                width: '100%'
+            });
+
+            $('.mainform .select88').select2({
                 //-^^^^^^^^--- update here
                 tags: true,
                 placeholder: "Select an Option",

@@ -47,7 +47,7 @@
                         <h4 class="mb-0">{{  $tickets_icon->where('status','On Progress')->count() }}</h4>
                     </div>
                 </div>
-                
+
                 {{-- <hr class="dark horizontal my-0">
                 <div class="card-footer p-3">
                     <p class="mb-0"><span class="text-danger text-sm font-weight-bolder">-2%</span> than yesterday</p>
@@ -180,7 +180,7 @@
                                     <th class="text-uppercase text-secondary text-xs font-weight-bolder  ps-3">
                                         Status
                                     </th>
-                                   
+
                                 </tr>
                             </thead>
                             <tbody>

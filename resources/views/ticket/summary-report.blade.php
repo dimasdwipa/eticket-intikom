@@ -83,6 +83,14 @@
                                 <thead>
 
                                     <tr>
+                                        <th
+                                        class="text-center text-uppercase text-secondary text-xs font-weight-bolder  ps-3">
+                                        Action
+                                    </th>
+                                        <th class="text-uppercase text-secondary text-xs font-weight-bolder  ps-3">
+                                            Status
+                                        </th>
+
                                         <th>
                                             #TIcket</th>
                                         <th
@@ -124,81 +132,10 @@
                                         <th class="text-uppercase text-secondary text-xs font-weight-bolder  ps-3">
                                             Priority
                                         </th>
-                                        <th class="text-uppercase text-secondary text-xs font-weight-bolder  ps-3">
-                                            Status
-                                        </th>
-                                        <th
-                                            class="text-center text-uppercase text-secondary text-xs font-weight-bolder  ps-3">
-                                            Action
-                                        </th>
+
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach ($tickets as $item)
-                                        <tr>
-                                            <td class="font-weight-bold">#{{ $item->code }}</td>
-                                            <td>{{ $item->team->name??""}}</td>
-                                            <td>{{ date_format(date_create($item->created_at), 'd-M-y') }}</td>
-                                            <td>{{ $item->katagoriAllTeams->kategori ?? '' }}</td>
-                                            <td>{{ $item->sub_katagoriAllTeams->sub_kategori ?? '' }}</td>
-                                            <td>{{ $item->agent->name ?? '' }}</td>
-                                            <td><button type="button" class="btn btn-sm btn-outline-info m-0 p-1"
-                                                style="width: 5rem" data-bs-toggle="modal" data-bs-target="#Detail"
-                                                data-problem="{{ $item->problem }}" >Detail</button></td>
-                                            <td>{{ $item->solution }}</td>
-                                            <td>{{ $item->note }}</td>
-                                            <td>{{ $item->estimation_date }}</td>
-                                            <td>{{ $item->sla_resolved }}</td>
-                                            <td>{{ $item->sla_close }}</td>
-                                            <td>
-                                                <div class="btn-group btn-group-sm" role="group">
-                                                    <a class="btn btn-sm btn-outline-info m-0 p-1"
-                                                    style="width: 5rem" href="{{url('storage/files/tickets/'.$item->files)}}" target="_blank" >
-                                                    Show
-                                                    </a>
-                                                    <a class="btn btn-sm btn-outline-success m-0 p-1"
-                                                    style="width: 5rem" href="{{url('storage/files/tickets/'.$item->files)}}" target="_blank"  download>
-                                                    Donwload
-                                                    </a>
-                                                </div>
-                                            </td>
-                                            <td>{{ $item->prioritas }}</td>
-                                            <td>{{ $item->status }}</td>
-
-                                            <td>
-                                                @if ($item->status != 'Closed')
-                                                    @if ($item->status != 'Canceled')
-                                                <div class="btn-group btn-group-sm" role="group">
-                                                    <button type="button"
-                                                        class="btn btn-sm btn-outline-success m-0 p-1"
-                                                        style="width: 5rem" data-bs-toggle="modal"
-                                                        data-bs-target="#close"
-                                                        data-id="{{ $item->id }}">Close</button>
-                                                    <button type="button"
-                                                        class="btn btn-sm btn-outline-warning m-0 p-1"
-                                                        style="width: 5rem" data-bs-toggle="modal"
-                                                        data-bs-target="#complain" data-id="{{ $item->id }}"
-                                                        data-code="{{ $item->code }}"
-                                                        data-katagori="{{ $item->katagoriAllTeams->kategori ?? '' }}"
-                                                        data-status="{{ $item->status }}"
-                                                        data-agent="{{ $item->agent->name ?? '--' }}">Complain</button>
-                                                </div>
-                                                    @endif
-
-                                                @endif
-
-                                                @if (($item->status == 'Closed'||$item->status == 'Canceled' )&& empty($item->rating))
-                                                    <button type="button"
-                                                            class="btn btn-sm btn-outline-secondary m-0 p-1"
-                                                            style="width: 10rem" data-bs-toggle="modal"
-                                                            data-bs-target="#rating"
-                                                            data-id="{{ $item->id }}">Give Rating</button>
-                                                @endif
-                                            </td>
-                                        </tr>
-                                    @endforeach
-
-
                                 </tbody>
                             </table>
                         </div>
@@ -216,12 +153,12 @@
                     <div class="float-start">
                     <h6 class="mt-1 mb-0">Data Ticket</h6>
                     </div>
-                   
+
                     <!-- End Toggle Button -->
                 </div>
                 <hr class="horizontal dark my-1">
                 <div id="sidebar_data_body" class="card-body pt-sm-3 pt-0">
-                   
+
                 </div>
                 </div>
             </div>
@@ -475,69 +412,87 @@
 @push('scripts')
     <script>
         $(document).ready(function() {
-            $('.tableku').DataTable({
-                dom: 'Blfrtip',
-                "order": [],
-                "showNEntries": true,
-                buttons: [{
-                        text: 'filter',
-                        footer: true,
-                        className: 'btn btn-sm btn-white btn-outline-primary shadow rounded filter'
-                    },
-                    {
-                        extend: 'excelHtml5',
-                        footer: true,
-                        className: 'btn btn-sm btn-success shadow rounded'
-                    },
-                    {
-                        extend: 'csvHtml5',
-                        footer: true,
-                        className: 'btn btn-sm btn-success shadow rounded'
-                    },
-                    {
-                        extend: 'pdfHtml5',
-                        footer: true,
-                        orientation: 'landscape',
-                        className: 'btn btn-sm btn-success shadow rounded'
-                    },
-                    {
-                        extend: 'print',
-                        footer: true,
-                        orientation: 'landscape',
-                        className: 'btn btn-sm btn-success shadow rounded',
+        $('.tableku').DataTable({
+            "processing": true,
+            "serverSide": true,
+            "ajax": "{{ route('api.summary-report') }}",
 
-                        customize: function(win) {
-                            $(win.document.body).find('div.dataTables_wrapper').addClass('display')
-                                .html('text-align', 'center');
-
-                            //  $(win.document.body).find('div.dt-buttons').append('<button type="button" class="btn btn-sm btn-outline-primary"><i class="fas fa-filter"></i></button>');
-                            $(win.document.body).find('th').addClass('display').css('text-align',
-                                'center');
-                            $(win.document.body).find('th').addClass('display').css('color',
-                                '#000000');
-
-
-                            $(win.document.body).find('table').addClass('display').css('font-size',
-                                '16px');
-                            $(win.document.body).find('table').addClass('display').css('text-align',
-                                'center');
-                            $(win.document.body).find('tr:nth-child(odd) td').each(function(index) {
-                                // $(this).css('background-color', '#D0D0D0');
-                                $(this).css('color', '#000000');
-                            });
-                            $(win.document.body).find('h1').css('text-align', 'center');
-                            $(win.document.body).find('td').addClass('display').css('color',
-                                '#000000 !important');
+            "columns": [
+                {
+                    "data": null,
+                    "orderable": false,
+                    "searchable": false,
+                    "render": function(data, type, row) {
+                        let buttons = '';
+                        if (row.status === 'Resolved') {
+                            buttons += `<button type="button" class="btn btn-sm btn-success m-1">CLOSE</button>`;
+                            buttons += `<button type="button" class="btn btn-sm btn-warning m-1">COMPLAIN</button>`;
+                        } else if (row.status !== 'Closed' && row.status !== 'Canceled') {
+                            buttons += `<button type="button" class="btn btn-sm btn-outline-success m-1" data-bs-toggle="modal" data-bs-target="#close" data-id="${row.id}">Close</button>`;
+                            buttons += `<button type="button" class="btn btn-sm btn-outline-warning m-1" data-bs-toggle="modal" data-bs-target="#complain" data-id="${row.id}">Complain</button>`;
                         }
+                        if ((row.status === 'Closed' || row.status === 'Canceled') && !row.rating) {
+                            buttons += `<button type="button" class="btn btn-sm btn-outline-secondary m-1" data-bs-toggle="modal" data-bs-target="#rating" data-id="${row.id}">Give Rating</button>`;
+                        }
+                        return `<div class="btn-group" role="group">${buttons}</div>`;
                     }
-                ],
-                language: {
-                    'search': '' /*Empty to remove the label*/
                 },
-                "paging": true,
-                "bAutoWidth": false,
-            });
+                { "data": "status" },
+                { "data": "code", "name": "tickets.code" },
+                { "data": "team.name", "name": "team.name", "defaultContent": "-" },
+                { "data": "created_at", "name": "tickets.created_at" },
+                { "data": "katagori.kategori", "defaultContent": "-" },
+                { "data": "sub_katagori.sub_kategori", "defaultContent": "-" },
+                { "data": "agent.name", "name": "agent.name", "defaultContent": "-" },
+                
+                // VVV PERBAIKAN KOLOM PROBLEM VVV
+                { 
+                    "data": "problem",
+                    "render": function(data, type, row) {
+                        // "data" di sini berisi nilai dari row.problem
+                        return `<button type="button" class="btn btn-sm btn-outline-info" data-bs-toggle="modal" data-bs-target="#Detail" data-problem="${data}">DETAIL</button>`;
+                    }
+                },
+                // ^^^ AKHIR PERBAIKAN ^^^
+
+                { "data": "solution", "defaultContent": "-" },
+                { "data": "note", "defaultContent": "-" },
+                { "data": "estimation_date", "defaultContent": "-" },
+                { "data": "resolved_date", "defaultContent": "-" },
+                { "data": "closed_date", "defaultContent": "-" },
+
+                // VVV PERBAIKAN KOLOM FILE VVV
+                { 
+                    "data": "files", 
+                    "orderable": false, 
+                    "searchable": false,
+                    "render": function(data, type, row) {
+                        // "data" di sini berisi nama file dari row.files
+                        if (data) { // Hanya tampilkan tombol jika ada nama filenya
+                            let fileUrl = '/storage/files/tickets/' + data;
+                            return `
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <a href="${fileUrl}" target="_blank" class="btn btn-sm btn-outline-info m-0 p-1">SHOW</a>
+                                    <a href="${fileUrl}" download class="btn btn-sm btn-outline-success m-0 p-1">DOWNLOAD</a>
+                                </div>
+                            `;
+                        }
+                        return '-'; // Tampilkan strip jika tidak ada file
+                    }
+                },
+                // ^^^ AKHIR PERBAIKAN ^^^
+                
+                { "data": "prioritas" }
+            ],
+
+            dom: 'Blfrtip',
+            "order": [],
+            buttons: [ 'excelHtml5', 'csvHtml5', 'pdfHtml5', 'print' ],
+            language: { 'search': '' },
+            "paging": true,
+            "bAutoWidth": false,
         });
+    });
 
         $('#Detail').on('show.bs.modal', function(event) {
                 var button = $(event.relatedTarget)
@@ -617,16 +572,16 @@
                 $("#to").datepicker("option", "minDate", minValue);
             })
         });
-        $('#close_sidebar_data').click(function (e) { 
+        $('#close_sidebar_data').click(function (e) {
             $('#sidebar_data').hide();
                 $('#table_data').removeClass('col-9');
                 $('#table_data').addClass('col-12');
         });
         $(document).ready(function() {
-           
+
             // Reference to the sidebar
             var sidebar = $('#sidebar_data');
-            
+
             // Add a click event listener to all table rows
             $('.tableku tr').click(function() {
                 // Hide the sidebar initially

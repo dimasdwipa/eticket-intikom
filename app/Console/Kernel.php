@@ -24,7 +24,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        
+
         $schedule->command('action:ticketoverdue')
             ->everyThirtyMinutes();
         $schedule->command('action:closeticket')
@@ -32,8 +32,10 @@ class Kernel extends ConsoleKernel
         $schedule->command('action:remederrating')
             ->everySixHours();
         $schedule->command('action:sendassignment')
-            ->everyThirtyMinutes();
-            // ->everyMinute();
+            //    ->everyThirtyMinutes();
+            ->everyMinute();
+
+        $schedule->command('assets:check-overdue-returns')->dailyAt('10:00');
     }
 
     /**

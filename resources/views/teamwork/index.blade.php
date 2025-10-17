@@ -108,7 +108,7 @@
             <div class="card-header">
                 <div class="row">
                     <div class="col-sm">
-                        <h4 class="card-title">Pending Request</h4>
+                        <h4 class="card-title">Pending Request From Agent</h4>
                     </div>
                 </div>
             </div>

@@ -20,7 +20,8 @@ use Illuminate\Support\Facades\Route;
 
 Auth::routes(['Register'=>false,'reset' => false,'confirm' => false]);
 
-Route::get('/test', [ App\Http\Controllers\TestController::class, 'index'])->name('sa.test');
+Route::get('/test/{id}', [ App\Http\Controllers\TestController::class, 'index'])->name('sa.test');
+Route::get('/guest/dashboard/{id}', function () { return view('guest.dashboard'); })->name('guest.dashboard');
 
 Route::redirect('/', 'login');
 
@@ -38,22 +39,30 @@ Route::group(['middleware' => ['web', 'MsGraphAuthenticated'], 'prefix' => 'app'
 Route::middleware(['auth'])->group(function (){
 
 
-    
+
+
+
+    Route::get('/delete-data-years', [App\Http\Controllers\AdministratorController::class, 'index'])->name('delete-data-form');
+    Route::post('/delete-data-years', [App\Http\Controllers\AdministratorController::class, 'deleteLastYearData'])->name('delete-data-action');
+
+
 
     Route::get('/home', [ App\Http\Controllers\HomeController::class, 'index'])->name('home');
     Route::get('select/tenant', [ App\Http\Controllers\HomeController::class, 'tenant'])->name('select.tenant');
     Route::get('/homeuser/{id}', [ App\Http\Controllers\HomeController::class, 'homeuser'])->name('homeuser');
     Route::post('/notif', [ App\Http\Controllers\HomeController::class, 'notif'])->name('notif');
 
-    
+
     Route::resource('/profile', App\Http\Controllers\ProfileController::class);
     Route::put('/permission/{profile}', [App\Http\Controllers\ProfileController::class,'permission'])->name('permission.update');
-    
- 
-    
+
+
+
     Route::get('/user', [ App\Http\Controllers\TicketController::class, 'index'])->name('user');
     Route::resource('/ticket', App\Http\Controllers\TicketController::class);
     Route::get('/summary-report', [App\Http\Controllers\TicketController::class,'report'])->name('summary-report');
+    Route::get('/api/summary-report', [App\Http\Controllers\TicketController::class, 'getSummaryReportApi'])->name('api.summary-report');
+
     Route::post('/ticket-close', [App\Http\Controllers\TicketController::class,'close'])->name('ticket-close');
     Route::post('/ticket-rating', [App\Http\Controllers\TicketController::class,'rating'])->name('ticket-rating');
     Route::post('/ticket-complain', [App\Http\Controllers\TicketController::class,'complain'])->name('ticket-complain');
@@ -86,6 +95,14 @@ Route::middleware(['auth'])->group(function (){
 
     Route::get('/import-user', [App\Http\Controllers\SupervisorController::class,'import_user'])->name('import.user.ldap');
 
+    Route::resource('/asset-request', App\Http\Controllers\AssetRequestController::class);
+    Route::resource('/asset-agent', App\Http\Controllers\AssetAgentController::class);
+    Route::resource('/asset-supervisor', App\Http\Controllers\AssetSupervisorController::class);
+    Route::resource('/asset-item', App\Http\Controllers\AssetController::class);
+    Route::get('/asset-report', [App\Http\Controllers\AssetSupervisorController::class,'report_asset'])->name('asset_report');
+    Route::get('/asset-report-movement', [App\Http\Controllers\AssetSupervisorController::class,'report_movement_asset'])->name('report_movement_asset');
+
+
 
     /**
      * Teamwork routes
@@ -113,7 +130,7 @@ Route::middleware(['auth'])->group(function (){
 
 
 
-    
+
 
 });
 
@@ -129,7 +146,7 @@ Route::group(['prefix' => 'sa','name'=>'sa.' ,'middleware' => 'auth'], function 
     Route::get('/summary-report-sumpervisor-sla-sa', [App\Http\Controllers\SalesSupervisorController::class,'sla_report_sa'])->name('sa.supervisor.summary-report-sumpervisor-sla_sa');
     Route::get('/summary-report-sumpervisor', [App\Http\Controllers\SalesSupervisorController::class,'report'])->name('sa.supervisor.summary-report-sumpervisor');
     Route::post('/summary-report-sumpervisor-update', [App\Http\Controllers\SalesSupervisorController::class,'updatereport'])->name('sa.supervisor.summary-report-sumpervisor-update');
- 
+
     //agent
     Route::resource('agent', App\Http\Controllers\SalesAgentController::class)->names('sa.agent');
     Route::get('/my-ticket', [App\Http\Controllers\SalesAgentController::class,'assignment'])->name('sa.agent.myticket');
@@ -139,8 +156,19 @@ Route::group(['prefix' => 'sa','name'=>'sa.' ,'middleware' => 'auth'], function 
     Route::get('/request-extend', [App\Http\Controllers\SalesAgentController::class,'request_extend'])->name('sa.agent.request-extend');
     Route::get('/agent-complain', [App\Http\Controllers\SalesAgentController::class,'complain'])->name('sa.agent.complain');
 
-   
+
     // user
     Route::get('/summary-report', [App\Http\Controllers\SalesTicketController::class,'report'])->name('sa.summary-report');
     Route::post('/ticket-complain', [App\Http\Controllers\SalesTicketController::class,'complain'])->name('sa.ticket-complain');
 });
+
+if (app()->isLocal()) {
+    Route::get('/login-local', function () {
+        $user = \App\Models\User::where('email', 'developer@local.com')->first();
+        if ($user) {
+            auth()->login($user);
+            return redirect('/user'); // Arahkan ke halaman utama setelah login
+        }
+        return 'User local tidak ditemukan. Jalankan seeder terlebih dahulu.';
+    });
+}

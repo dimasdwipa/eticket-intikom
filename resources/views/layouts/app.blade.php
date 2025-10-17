@@ -214,8 +214,8 @@
                 <i class="fa fa-cog fixed-plugin-button-nav cursor-pointer"></i>
               </a>
             </li>
-            <livewire:job />
-            <livewire:notification />
+            {{-- <livewire:job />
+            <livewire:notification /> --}}
 
           </ul>
 

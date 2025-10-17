@@ -2,18 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\MailController;
+use App\Models\Complain;
+use App\Models\Kategori;
+use App\Models\Lokasi;
+use App\Models\SubKategori;
 use App\Models\Ticket;
 use App\Models\User;
-use App\Models\Lokasi;
-use App\Models\Kategori;
-use App\Models\SubKategori;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use App\Models\Complain;
-use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
-use App\Http\Controllers\MailController;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 class SalesSupervisorController extends Controller
@@ -28,16 +28,15 @@ class SalesSupervisorController extends Controller
 
         $this->middleware('auth');
         $this->middleware(function ($request, $next) {
-            if (auth()->guest() || ! auth()->user()->currentTeam) {
+            if (auth()->guest() || !auth()->user()->currentTeam) {
                 return redirect('teams');
             }
-            if (Auth::user()->role=="manager"||Auth::user()->role=="supervisor"||Auth::user()->role=="administrator"||Auth::user()->role=="supervisor-agent"||Auth::user()->role=="supervisor-agent-user"){
+            if (Auth::user()->role == "manager" || Auth::user()->role == "supervisor" || Auth::user()->role == "administrator" || Auth::user()->role == "supervisor-agent" || Auth::user()->role == "supervisor-agent-user") {
 
                 return $next($request);
-            }else{
+            } else {
                 return redirect('no-access');
             }
-
 
         });
 
@@ -46,8 +45,7 @@ class SalesSupervisorController extends Controller
     public function index()
     {
 
-      
-        $tickets_icon=Ticket::whereBetween('created_at',[Carbon::now()->subYear(), Carbon::now()])
+        $tickets_icon = Ticket::whereBetween('created_at', [ Carbon::now()->startOfYear(), Carbon::now()])
         // ->when(!empty($_GET['status']),function($query){
         //     if($_GET['status']!='Overdue'){
         //         return $query->where('status', 'On Progress')
@@ -57,25 +55,21 @@ class SalesSupervisorController extends Controller
         //         return $query->where('status', $_GET['status']);
         //     }
         //  })
-        ->orderby('created_at','desc')->get();
+            ->orderby('created_at', 'desc')->get();
 
-         
-
-        
         $agents = User::GetTeam()
-        ->where(function($query){
-            $query->where('role','supervisor-agent')
-            ->orwhere('role','supervisor-agent-user')
-            ->orwhere('role','agent')
-            ->orwhere('role','agent-user');
-        })
-        
-       
+            ->where(function ($query) {
+                $query->where('role', 'supervisor-agent')
+                    ->orwhere('role', 'supervisor-agent-user')
+                    ->orwhere('role', 'agent')
+                    ->orwhere('role', 'agent-user');
+            })
+
             ->orderby('name', 'asc')
             ->get();
         return view('sales-tiket.supervisor.home')
             ->with('agents', $agents)
-            ->with('tickets_icon',$tickets_icon);
+            ->with('tickets_icon', $tickets_icon);
     }
 
     /**
@@ -86,7 +80,7 @@ class SalesSupervisorController extends Controller
     public function assignment()
     {
         $hari_ini = date("Y-m-d");
-        $tgl_pertama = date('Y-m-t', strtotime(date("Y-m-d", strtotime($hari_ini)) . " - 365 day"));
+        $tgl_pertama = date('Y-01-01', strtotime($hari_ini));
         $tgl_terakhir = date('Y-m-t', strtotime($hari_ini));
 
         if (!empty($_GET['start_date'])) {
@@ -101,22 +95,20 @@ class SalesSupervisorController extends Controller
         $tickets = Ticket::select('tickets.*', 'users.name')
             ->leftjoin('users', 'tickets.agent_id', '=', 'users.id')
             ->when(!empty($_GET['filter_by']), function ($query) {
-                return $query->where($_GET['filter_by'], 'like',  '%' . $_GET['keyword'] . '%');
+                return $query->where($_GET['filter_by'], 'like', '%' . $_GET['keyword'] . '%');
             })
-            // ->whereBetween('tickets.created_at', [$tgl_pertama.' 00:00:00', $tgl_terakhir.' 23:59:59'])
+        // ->whereBetween('tickets.created_at', [$tgl_pertama.' 00:00:00', $tgl_terakhir.' 23:59:59'])
             ->where('tickets.status', 'Open')
             ->orderby('tickets.created_at', 'desc')->get();
 
-
-
         $agents = User::GetTeam()
-        ->where(function($query){
-            $query->where('role','supervisor-agent')
-            ->orwhere('role','supervisor-agent-user')
-            ->orwhere('role','agent')
-            ->orwhere('role','agent-user');
-        })
-        
+            ->where(function ($query) {
+                $query->where('role', 'supervisor-agent')
+                    ->orwhere('role', 'supervisor-agent-user')
+                    ->orwhere('role', 'agent')
+                    ->orwhere('role', 'agent-user');
+            })
+
             ->orderby('name', 'asc')
             ->get();
 
@@ -128,20 +120,20 @@ class SalesSupervisorController extends Controller
     public function create()
     {
         $agents = User::GetTeam()
-        ->where(function($query){
-            $query->where('role','supervisor-agent')
-            ->orwhere('role','supervisor-agent-user')
-            ->orwhere('role','agent')
-            ->orwhere('role','agent-user');
-        })
+            ->where(function ($query) {
+                $query->where('role', 'supervisor-agent')
+                    ->orwhere('role', 'supervisor-agent-user')
+                    ->orwhere('role', 'agent')
+                    ->orwhere('role', 'agent-user');
+            })
             ->orderby('name', 'asc')
             ->get();
 
         return view('supervisor.create')
-            ->with('lokasi', Lokasi::orderby('created_at','desc')->get())
-            ->with('kategori', Kategori::orderby('created_at','desc')->get())
+            ->with('lokasi', Lokasi::orderby('created_at', 'desc')->get())
+            ->with('kategori', Kategori::orderby('created_at', 'desc')->get())
             ->with('agents', $agents)
-            ->with('subkategori', SubKategori::orderby('created_at','desc')->get());
+            ->with('subkategori', SubKategori::orderby('created_at', 'desc')->get());
     }
 
     /**
@@ -160,18 +152,18 @@ class SalesSupervisorController extends Controller
             'subkatagori.*' => 'required',
             'agent_id.*' => 'required',
         ]);
-        $code=strtotime(now());
+        $code = strtotime(now());
 
         DB::beginTransaction();
 
         try {
             foreach ($request->katagori as $key => $item) {
-                $sk=  SubKategori::find($request->subkategori[$key]);
+                $sk = SubKategori::find($request->subkategori[$key]);
 
-                $file_data=false;
+                $file_data = false;
 
                 $data = new Ticket();
-                $data->code = $code. $key;
+                $data->code = $code . $key;
                 $data->tanggal = $request->tanggal;
                 $data->bu = $request->bu;
                 $data->lokasi_id = $request->lokasi;
@@ -183,26 +175,23 @@ class SalesSupervisorController extends Controller
                 $data->agent_id = $request->agent_id[$key];
                 $data->sla_ticket_time = $request->sla_ticket_time[$key];
                 $data->prioritas = $request->prioritas[$key];
-                $data->sla_ticket_time = !empty($request->sla_ticket_time[$key]) ? $request->sla_ticket_time[$key]: $sk->extend_ticket_SLA_default;
-                $data->sla_response_time=$sk->extend_response_SLA_default;
+                $data->sla_ticket_time = !empty($request->sla_ticket_time[$key]) ? $request->sla_ticket_time[$key] : $sk->extend_ticket_SLA_default;
+                $data->sla_response_time = $sk->extend_response_SLA_default;
                 $data->sla_assignment = now();
                 $data->status = 'Awaiting Response';
 
                 try {
-                    $data->files=$code.$key.'.'.$request->file('files')[$key]->extension() ??null;
-                    $file_data=true;
+                    $data->files = $code . $key . '.' . $request->file('files')[$key]->extension() ?? null;
+                    $file_data = true;
                 } catch (\Throwable $th) {
                     //throw $th;
                 }
 
                 $data->save();
 
-
-                if($file_data){
-                    Storage::putFileAs("public/files/tickets",$request->file('files')[$key],$code.$key.'.'.$request->file('files')[$key]->extension());
-                 }
-
-
+                if ($file_data) {
+                    Storage::putFileAs("public/files/tickets", $request->file('files')[$key], $code . $key . '.' . $request->file('files')[$key]->extension());
+                }
 
                 $complain = new Complain();
                 $complain->ticket_id = $data->id;
@@ -210,13 +199,12 @@ class SalesSupervisorController extends Controller
                 $complain->agent_id = $request->agent_id[$key];
                 $complain->comment = $request->problem[$key];
                 $complain->note = "Give task to agent";
-                $complain->status="Assignment";
-                $complain->approve=null;
+                $complain->status = "Assignment";
+                $complain->approve = null;
                 $complain->save();
 
-
-                $email=new MailController();
-                $email->actionticket($data->id,"task");
+                $email = new MailController();
+                $email->actionticket($data->id, "task");
 
             }
 
@@ -226,7 +214,6 @@ class SalesSupervisorController extends Controller
             return back()->with('error', $th);
         }
 
-
         return redirect('supervisor')->with('success', 'Create tasking #' . $data->code . ' successfully.');
 
     }
@@ -235,7 +222,7 @@ class SalesSupervisorController extends Controller
     {
         $validated = $request->validate([
             'agent_id' => 'required|max:255',
-            'sla_ticket_time' => 'required|max:255'
+            'sla_ticket_time' => 'required|max:255',
         ]);
 
         // DB::beginTransaction();
@@ -260,11 +247,8 @@ class SalesSupervisorController extends Controller
             $data2->approve = null;
             $data2->save();
 
-
-
-            $email=new MailController();
-            $email->actionticket($data->id,"assignment");
-
+            $email = new MailController();
+            $email->actionticket($data->id, "assignment");
 
             // DB::commit();
         } catch (\Throwable $th) {
@@ -323,7 +307,7 @@ class SalesSupervisorController extends Controller
     public function report()
     {
         $hari_ini = date("Y-m-d");
-        $tgl_pertama = date('Y-m-t', strtotime(date("Y-m-d", strtotime($hari_ini)) . " - 365 day"));
+        $tgl_pertama = date('Y-01-01', strtotime($hari_ini));
         $tgl_terakhir = date('Y-m-t', strtotime($hari_ini));
 
         if (!empty($_GET['start_date'])) {
@@ -338,29 +322,26 @@ class SalesSupervisorController extends Controller
         $tickets = Ticket::select('tickets.*', 'users.name')
             ->leftjoin('users', 'tickets.agent_id', '=', 'users.id')
             ->when(!empty($_GET['filter_by']), function ($query) {
-                return $query->where($_GET['filter_by'], 'like',  '%' . $_GET['keyword'] . '%');
+                return $query->where($_GET['filter_by'], 'like', '%' . $_GET['keyword'] . '%');
             })
             ->whereBetween('tickets.created_at', [$tgl_pertama . ' 00:00:00', $tgl_terakhir . ' 23:59:59'])
-            // ->where('tickets.status','!=','Open')
+        // ->where('tickets.status','!=','Open')
             ->orderby('tickets.created_at', 'desc')->get();
 
-
-
         $agents = User::GetTeam()
-        ->where(function($query){
-            $query->where('role','supervisor-agent')
-            ->orwhere('role','supervisor-agent-user')
-            ->orwhere('role','agent')
-            ->orwhere('role','agent-user');
-        })
+            ->where(function ($query) {
+                $query->where('role', 'supervisor-agent')
+                    ->orwhere('role', 'supervisor-agent-user')
+                    ->orwhere('role', 'agent')
+                    ->orwhere('role', 'agent-user');
+            })
             ->orderby('name', 'asc')
             ->get();
 
-
         return view('sales-tiket.supervisor.summary-report')
-            ->with('lokasi', Lokasi::orderby('created_at','desc')->get())
-            ->with('kategori', Kategori::orderby('created_at','desc')->get())
-            ->with('subkategori', SubKategori::orderby('created_at','desc')->get())
+            ->with('lokasi', Lokasi::orderby('created_at', 'desc')->get())
+            ->with('kategori', Kategori::orderby('created_at', 'desc')->get())
+            ->with('subkategori', SubKategori::orderby('created_at', 'desc')->get())
             ->with('agents', $agents)
             ->with('tickets', $tickets);
     }
@@ -368,7 +349,6 @@ class SalesSupervisorController extends Controller
     public function updatereport(Request $request)
     {
 
-   
         try {
             $SubKategori = SubKategori::findorfail($request->sub_katagori_id);
 
@@ -389,7 +369,7 @@ class SalesSupervisorController extends Controller
             if ($request->status != null) {
                 $data->status = $request->status;
             }
-            
+
             $data->save();
 
             // $email=new MailController();
@@ -405,7 +385,7 @@ class SalesSupervisorController extends Controller
     public function request_extend()
     {
         $hari_ini = date("Y-m-d");
-        $tgl_pertama = date('Y-m-t', strtotime(date("Y-m-d", strtotime($hari_ini)) . " - 365 day"));
+        $tgl_pertama = date('Y-01-01', strtotime($hari_ini));
         $tgl_terakhir = date('Y-m-t', strtotime($hari_ini));
 
         if (!empty($_GET['start_date'])) {
@@ -421,47 +401,42 @@ class SalesSupervisorController extends Controller
             ->leftjoin('users', 'complains.agent_id', '=', 'users.id')
             ->leftjoin('tickets', 'complains.ticket_id', '=', 'tickets.id')
             ->when(!empty($_GET['filter_by']), function ($query) {
-                return $query->where($_GET['filter_by'], 'like',  '%' . $_GET['keyword'] . '%');
+                return $query->where($_GET['filter_by'], 'like', '%' . $_GET['keyword'] . '%');
             })
-            ->where(function($query){
-                if(!empty($_GET['alltype'])){
-                    if($_GET['alltype']==1){
+            ->where(function ($query) {
+                if (!empty($_GET['alltype'])) {
+                    if ($_GET['alltype'] == 1) {
                         $query->where('complains.approve', 'await')
-                        ->orwhere('complains.approve', 'aproved')
-                        ->orwhere('complains.approve', 'rejected');
-                    }else{
+                            ->orwhere('complains.approve', 'aproved')
+                            ->orwhere('complains.approve', 'rejected');
+                    } else {
 
                         $query->where('complains.approve', 'await');
                     }
-                }else{
+                } else {
                     $query->where('complains.approve', 'await');
                 }
 
             })
             ->orderby('complains.created_at', 'desc')->get();
 
-            // dd($tickets);
+        // dd($tickets);
 
-
-        $agents = User::GetTeam()
-        ->where(function($query){
-            $query->where('role','supervisor-agent')
-            ->orwhere('role','supervisor-agent-user')
-            ->orwhere('role','agent')
-            ->orwhere('role','agent-user');
-        })
-            ->orderby('name', 'asc')
-            ->get();
 
         return view('sales-tiket.supervisor.request-extend')
-            ->with('agents', $agents)
+            ->with('sales_admin',User::GetTeam()->where(function($query){
+                $query->where('role','supervisor-agent')
+                ->orwhere('role','supervisor-agent-user')
+                ->orwhere('role','agent')
+                ->orwhere('role','agent-user');
+            })->get())
             ->with('tickets', $tickets);
     }
 
     public function complain()
     {
         $hari_ini = date("Y-m-d");
-        $tgl_pertama = date('Y-m-t', strtotime(date("Y-m-d", strtotime($hari_ini)) . " - 365 day"));
+        $tgl_pertama = date('Y-01-01', strtotime($hari_ini));
         $tgl_terakhir = date('Y-m-t', strtotime($hari_ini));
 
         if (!empty($_GET['start_date'])) {
@@ -477,20 +452,18 @@ class SalesSupervisorController extends Controller
             ->leftjoin('users', 'complains.agent_id', '=', 'users.id')
             ->leftjoin('tickets', 'complains.ticket_id', '=', 'tickets.id')
             ->when(!empty($_GET['filter_by']), function ($query) {
-                return $query->where($_GET['filter_by'], 'like',  '%' . $_GET['keyword'] . '%');
+                return $query->where($_GET['filter_by'], 'like', '%' . $_GET['keyword'] . '%');
             })
-            ->where('complains.status',"Complain")
+            ->where('complains.status', "Complain")
             ->orderby('complains.created_at', 'desc')->get();
 
-
-
         $agents = User::GetTeam()
-        ->where(function($query){
-            $query->where('role','supervisor-agent')
-            ->orwhere('role','supervisor-agent-user')
-            ->orwhere('role','agent')
-            ->orwhere('role','agent-user');
-        })
+            ->where(function ($query) {
+                $query->where('role', 'supervisor-agent')
+                    ->orwhere('role', 'supervisor-agent-user')
+                    ->orwhere('role', 'agent')
+                    ->orwhere('role', 'agent-user');
+            })
             ->orderby('name', 'asc')
             ->get();
 
@@ -499,24 +472,22 @@ class SalesSupervisorController extends Controller
             ->with('tickets', $tickets);
     }
 
-
     public function request_extend_update(Request $request)
     {
         $validated = $request->validate([
             'id' => 'required|max:255',
-            'resolution' => 'required|max:255'
+            'resolution' => 'required|max:255',
         ]);
 
         try {
             DB::beginTransaction();
-          
-            $data = Complain::find($request->id);
 
+            $data = Complain::find($request->id);
 
             if ($request->resolution == "aproved") {
                 $data->approve = "aproved";
                 $data->save();
-            
+
                 $data2 = Ticket::find($data->ticket_id);
 
                 if ($data->status == "Request Close") {
@@ -534,12 +505,13 @@ class SalesSupervisorController extends Controller
                 } elseif ($data->status == "Extend SLA") {
                     $data2->sla_ticket_time = $data2->sla_ticket_time + $data->extend_SLA;
                     $data2->estimation_date = Carbon::create($data2->sla_respone)->addMinutes($data2->sla_ticket_time);
-                }elseif ($data->status == "Unable Respond") {
+                } elseif ($data->status == "Unable Respond") {
                     $data2->sla_response_time = $data2->sla_response_time + $data->extend_response_SLA;
                 }
-        
+
+                $data2->req_status = null;
                 $data2->save();
-            
+
                 $data3 = new Complain();
                 $data3->ticket_id = $data->ticket_id;
                 $data3->supervisor_id = Auth::id();
@@ -549,13 +521,10 @@ class SalesSupervisorController extends Controller
                 $data3->approve = null;
                 $data3->save();
 
-
-
                 DB::commit();
 
-             
-                $email=new MailController();
-                $email->actionticket($data->id,"Supervisor approval");
+                $email = new MailController();
+                $email->actionticket($data->id, "Supervisor approval");
                 return back()->with('Success', 'Request have been successfully approved.');
             } else {
 
@@ -571,14 +540,17 @@ class SalesSupervisorController extends Controller
                 $data3->approve = null;
                 $data3->save();
 
+                $data2 = Ticket::find($data->ticket_id);
+                $data2->req_status = null;
+                $data2->save();
+
                 DB::commit();
 
-                $email=new MailController();
-                $email->actionticket($data->id,"Supervisor aprovel");
+                $email = new MailController();
+                $email->actionticket($data->id, "Supervisor aprovel");
 
-                return back()->with('success','Request been successfully rejected.');
+                return back()->with('success', 'Request been successfully rejected.');
             }
-
 
         } catch (\Throwable $th) {
             DB::rollBack();
@@ -587,11 +559,10 @@ class SalesSupervisorController extends Controller
         }
     }
 
-
     public function sla_report()
     {
         $hari_ini = date("Y-m-d");
-        $tgl_pertama = date('Y-m-t', strtotime(date("Y-m-d", strtotime($hari_ini)) . " - 365 day"));
+        $tgl_pertama = date('Y-01-01', strtotime($hari_ini));
         $tgl_terakhir = date('Y-m-t', strtotime($hari_ini));
 
         if (!empty($_GET['start_date'])) {
@@ -606,28 +577,26 @@ class SalesSupervisorController extends Controller
         $tickets = Ticket::select('tickets.*', 'users.name')
             ->leftjoin('users', 'tickets.agent_id', '=', 'users.id')
             ->when(!empty($_GET['filter_by']), function ($query) {
-                return $query->where($_GET['filter_by'], 'like',  '%' . $_GET['keyword'] . '%');
+                return $query->where($_GET['filter_by'], 'like', '%' . $_GET['keyword'] . '%');
             })
             ->whereBetween('tickets.created_at', [$tgl_pertama . ' 00:00:00', $tgl_terakhir . ' 23:59:59'])
-            // ->where('tickets.status','!=','Open')
+        // ->where('tickets.status','!=','Open')
             ->orderby('tickets.created_at', 'desc')->get();
 
-
-
         $agents = User::GetTeam()
-        ->where(function($query){
-            $query->where('role','supervisor-agent')
-            ->orwhere('role','supervisor-agent-user')
-            ->orwhere('role','agent')
-            ->orwhere('role','agent-user');
-        })
+            ->where(function ($query) {
+                $query->where('role', 'supervisor-agent')
+                    ->orwhere('role', 'supervisor-agent-user')
+                    ->orwhere('role', 'agent')
+                    ->orwhere('role', 'agent-user');
+            })
             ->orderby('name', 'asc')
             ->get();
 
         return view('sales-tiket.supervisor.sla-summary-report')
-            ->with('lokasi', Lokasi::orderby('created_at','desc')->get())
-            ->with('kategori', Kategori::orderby('created_at','desc')->get())
-            ->with('subkategori', SubKategori::orderby('created_at','desc')->get())
+            ->with('lokasi', Lokasi::orderby('created_at', 'desc')->get())
+            ->with('kategori', Kategori::orderby('created_at', 'desc')->get())
+            ->with('subkategori', SubKategori::orderby('created_at', 'desc')->get())
             ->with('agents', $agents)
             ->with('tickets', $tickets);
     }
@@ -635,7 +604,7 @@ class SalesSupervisorController extends Controller
     public function sla_report_sa()
     {
         $hari_ini = date("Y-m-d");
-        $tgl_pertama = date('Y-m-t', strtotime(date("Y-m-d", strtotime($hari_ini)) . " - 365 day"));
+        $tgl_pertama = date('Y-01-01', strtotime($hari_ini));
         $tgl_terakhir = date('Y-m-t', strtotime($hari_ini));
 
         if (!empty($_GET['start_date'])) {
@@ -650,57 +619,55 @@ class SalesSupervisorController extends Controller
         $tickets = Ticket::select('tickets.*', 'users.name')
             ->leftjoin('users', 'tickets.agent_id', '=', 'users.id')
             ->when(!empty($_GET['filter_by']), function ($query) {
-                if($_GET['filter_by']=='status'){
-                    if($_GET['keyword']=='Request Feedback'){
+                if ($_GET['filter_by'] == 'status') {
+                    if ($_GET['keyword'] == 'Request Feedback') {
                         return $query->where('state', $_GET['keyword']);
-                    }elseif($_GET['keyword']=='Overdue'){
+                    } elseif ($_GET['keyword'] == 'Overdue') {
                         return $query->where('status', 'On Progress')
-                        ->whereRaw('DATE_ADD(sla_respone , interval sla_ticket_time MINUTE) < now()')
-                        ->whereNotNull('sla_respone');
-                    }else{
+                            // ->whereRaw('DATE_ADD(sla_respone , interval sla_ticket_time MINUTE) < now()')
+                            ->whereRaw('DATEADD(MINUTE, sla_ticket_time, sla_respone) < GETDATE()')
+                            ->whereNotNull('sla_respone');
+                    } else {
                         return $query->where('status', $_GET['keyword']);
                     }
-                }else{
-                    
-                    return $query->where($_GET['filter_by'], 'like',  '%' . $_GET['keyword'] . '%');
-                }
-               
+                } else {
 
-                
+                    return $query->where($_GET['filter_by'], 'like', '%' . $_GET['keyword'] . '%');
+                }
+
             })
             ->whereBetween('tickets.created_at', [$tgl_pertama . ' 00:00:00', $tgl_terakhir . ' 23:59:59'])
-            // ->where('tickets.status','!=','Open')
+        // ->where('tickets.status','!=','Open')
             ->orderby('tickets.created_at', 'desc')->get();
 
-
-
         $agents = User::GetTeam()
-        ->where(function($query){
-            $query->where('role','supervisor-agent')
-            ->orwhere('role','supervisor-agent-user')
-            ->orwhere('role','agent')
-            ->orwhere('role','agent-user');
-        })->orderby('name', 'asc')
+            ->where(function ($query) {
+                $query->where('role', 'supervisor-agent')
+                    ->orwhere('role', 'supervisor-agent-user')
+                    ->orwhere('role', 'agent')
+                    ->orwhere('role', 'agent-user');
+            })->orderby('name', 'asc')
             ->get();
 
         return view('sales-tiket.supervisor.sla-summary-report-sa')
-            ->with('lokasi', Lokasi::orderby('created_at','desc')->get())
-            ->with('kategori', Kategori::orderby('created_at','desc')->get())
-            ->with('subkategori', SubKategori::orderby('created_at','desc')->get())
+            ->with('lokasi', Lokasi::orderby('created_at', 'desc')->get())
+            ->with('kategori', Kategori::orderby('created_at', 'desc')->get())
+            ->with('subkategori', SubKategori::orderby('created_at', 'desc')->get())
             ->with('agents', $agents)
             ->with('tickets', $tickets);
     }
 
-    public function import_user(){
+    public function import_user()
+    {
 
-        if(Auth::user()->role=="supervisor"||Auth::user()->role=="manager"){
+        if (Auth::user()->role == "supervisor" || Auth::user()->role == "manager") {
 
             Artisan::call('ldap:import');
 
-            return back()->with('success','Import user from LDAP have been successfully.');
-        }else{
+            return back()->with('success', 'Import user from LDAP have been successfully.');
+        } else {
 
-            return back()->with('erorr','Your role not supervisor or manager.');
+            return back()->with('erorr', 'Your role not supervisor or manager.');
         }
     }
 }

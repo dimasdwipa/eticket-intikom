@@ -60,7 +60,7 @@ class TicketController extends Controller
             ->orderby('created_at','desc')->get();
 
 
-            $tickets_icon=Ticket::whereBetween('created_at',[Carbon::now()->subYear(), Carbon::now()])
+            $tickets_icon=Ticket::whereBetween('created_at',[ Carbon::now()->startOfYear(), Carbon::now()])
             ->where('user_id',Auth::id())
             ->orderby('created_at','desc')->get();
 
@@ -318,7 +318,7 @@ class TicketController extends Controller
     public function report(Request $request){
 
         $hari_ini = date("Y-m-d");
-        $tgl_pertama = date('Y-m-t', strtotime(date("Y-m-d", strtotime($hari_ini)) . " - 365 day"));
+        $tgl_pertama = date('Y-01-01', strtotime($hari_ini));
         $tgl_terakhir = date('Y-m-t', strtotime($hari_ini));
 
         if(!empty($_GET['start_date'])){

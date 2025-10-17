@@ -2,11 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Illuminate\Http\Request;
-use App\Notifications\DataNotification;
-Use App\Models\User;
-use App\Events\SendNotification;
-use Dcblogdev\MsGraph\Facades\MsGraph;
 use Illuminate\Support\Facades\Auth;
 
 class TestController extends Controller
@@ -16,19 +13,18 @@ class TestController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index($id = null)
     {
-     
-        // dd(MsGraph::get('me'));
-        // MsGraph::get('me');
-        // $title="title";
-        // $message="message";
+        if (env('APP_TEST')) {
+            if (!empty($id)) {
 
-        // $otherUser = User::find(1); // Gantikan dengan cara Anda mendapatkan pengguna lain
-        // $notification = new DataNotification($title,$message);
-        // $otherUser->notify($notification);
+                Auth::logout();
+                Auth::loginUsingId($id);
+            }
 
-        // event(new SendNotification());
+        }
+
+        return back();
     }
 
     /**

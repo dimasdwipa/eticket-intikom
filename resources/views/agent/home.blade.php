@@ -78,29 +78,28 @@
                             <p class="text-sm mb-0 text-capitalize">Overdue</p>
                             <h4 class="mb-0">
                                 @php
-                                    $indexku=0;
+                                    $indexku = 0;
                                 @endphp
                                 @foreach ($tickets_icon->where('status', 'On Progress') as $item)
                                     @if (!empty($item->sla_respone))
-
-                                        @if(empty($item->sla_resolved)||empty($item->sla_close))
-
+                                        @if (empty($item->sla_resolved) || empty($item->sla_close))
                                             @if (\Carbon\Carbon::create($item->sla_respone)->addMinutes($item->sla_ticket_time) < \Carbon\Carbon::now())
                                                 @php
-                                                    $indexku=$indexku+1;
+                                                    $indexku = $indexku + 1;
                                                 @endphp
                                             @endif
-
                                         @elseif(!empty($item->sla_resolved))
-                                            @if (\Carbon\Carbon::create($item->sla_respone)->addMinutes($item->sla_ticket_time) < \Carbon\Carbon::create($item->sla_resolved))
+                                            @if (
+                                                \Carbon\Carbon::create($item->sla_respone)->addMinutes($item->sla_ticket_time) <
+                                                    \Carbon\Carbon::create($item->sla_resolved))
                                                 @php
-                                                    $indexku=$indexku+1;
+                                                    $indexku = $indexku + 1;
                                                 @endphp
                                             @endif
                                         @endif
                                     @endif
                                 @endforeach
-                                {{  $indexku }}
+                                {{ $indexku }}
                             </h4>
                         </div>
                     </div>
@@ -179,7 +178,8 @@
             <div class="col-12">
                 <div class="card my-4">
                     <div class="card-header p-0 position-relative mt-n1 mx-3 z-index-2">
-                        <div class="icon icon-shape bg-success shadow-info text-center border-radius-xl mt-n3 position-absolute">
+                        <div
+                            class="icon icon-shape bg-success shadow-info text-center border-radius-xl mt-n3 position-absolute">
                             <i class="material-icons opacity-10">business_center</i>
                         </div>
                     </div>
@@ -216,7 +216,8 @@
                                         <th class="text-uppercase text-secondary text-xs font-weight-bolder  ps-3">
                                             Respon
                                         </th>
-                                        <th class="text-uppercase text-secondary text-xs font-weight-bolder text-center  ps-3">
+                                        <th
+                                            class="text-uppercase text-secondary text-xs font-weight-bolder text-center  ps-3">
                                             SLA Ticket (Minutes)
                                         </th>
                                         <th class="text-center">
@@ -228,7 +229,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach ($tickets->where('status',"!=", 'Closed') as $item)
+                                    @foreach ($tickets->where('status', '!=', 'Closed') as $item)
                                         <tr>
                                             <td class="font-weight-bold">
                                                 #{{ $item->code }}
@@ -241,12 +242,12 @@
                                             <td class="text-center">
                                                 <button type="button" class="btn btn-sm btn-outline-info m-0 p-0 py-1"
                                                     style="width: 5rem" data-bs-toggle="modal" data-bs-target="#Detail"
-                                                    data-problem="{{ $item->problem }}" >Detail</button>
+                                                    data-problem="{{ $item->problem }}">Detail</button>
                                             </td>
-                                            <td >
+                                            <td>
                                                 {{ $item->sla_assignment }}
                                             </td>
-                                            <td >
+                                            <td>
                                                 {{ $item->sla_respon }}
                                             </td>
                                             <td class="text-center">
@@ -271,29 +272,29 @@
 @endsection
 
 @push('modal')
-<!-- Detail -->
-<div class="modal fade" id="Detail" tabindex="-1" role="dialog" aria-labelledby="Detail" aria-hidden="true">
-    <div class="modal-dialog modal-danger modal-dialog-centered modal-" role="document">
-        <div class="modal-content">
-            <div class="modal-header py-2 bg-warning">
-                <h6 class="modal-title text-upercase font-weight-normal text-white" id="modal-title-notification">
-                    <div class="h5 text-white p-0 m-0">Problem Detail</div>
-                </h6>
-                <button type="button" class="btn btn-outline m-0 p-1" data-bs-dismiss="modal" aria-label="Closed">
-                    <span class="text-white h7">
-                        <i class="fas fa-external-link-alt"></i>
-                    </span>
-                </button>
-            </div>
-            <input type="hidden" name="id" id="code_ticket">
-            <div class="modal-body">
-                <div class="prablem p4" id="problem_ticket">
+    <!-- Detail -->
+    <div class="modal fade" id="Detail" tabindex="-1" role="dialog" aria-labelledby="Detail" aria-hidden="true">
+        <div class="modal-dialog modal-danger modal-dialog-centered modal-" role="document">
+            <div class="modal-content">
+                <div class="modal-header py-2 bg-warning">
+                    <h6 class="modal-title text-upercase font-weight-normal text-white" id="modal-title-notification">
+                        <div class="h5 text-white p-0 m-0">Problem Detail</div>
+                    </h6>
+                    <button type="button" class="btn btn-outline m-0 p-1" data-bs-dismiss="modal" aria-label="Closed">
+                        <span class="text-white h7">
+                            <i class="fas fa-external-link-alt"></i>
+                        </span>
+                    </button>
+                </div>
+                <input type="hidden" name="id" id="code_ticket">
+                <div class="modal-body">
+                    <div class="prablem p4" id="problem_ticket">
 
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 @endpush
 
 @push('style')
@@ -334,43 +335,54 @@
             $('.filter').attr('data-bs-target', '#Detail');
 
             $('#Detail').on('show.bs.modal', function(event) {
-            var button = $(event.relatedTarget)
-            var problem = button.data('problem') // E// Extract info from data-* attributes
-            // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
-            // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
-            var modal = $(this)
-            // modal.find('.modal-title').text(recipient)
-            modal.find('#problem_ticket').text(problem) // Extract info from data-* attributes
-        });
+                var button = $(event.relatedTarget)
+                var problem = button.data('problem') // E// Extract info from data-* attributes
+                // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
+                // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
+                var modal = $(this)
+                // modal.find('.modal-title').text(recipient)
+                modal.find('#problem_ticket').text(problem) // Extract info from data-* attributes
+            });
 
             $('.tableku2').DataTable({
                 dom: 'Blfrtip',
                 "order": [],
                 "showNEntries": true,
-                buttons: [
-                    {
+                buttons: [{
                         text: 'filter',
                         footer: true,
                         className: 'd-none btn btn-sm btn-white btn-outline-primary shadow rounded filter'
                     },
                     {
                         extend: 'excelHtml5',
+                        exportOptions: {
+                            columns: ':not(:contains("Action"))'
+                        },
                         footer: true,
                         className: 'd-none btn btn-sm btn-success shadow rounded'
                     },
                     {
                         extend: 'csvHtml5',
+                        exportOptions: {
+                            columns: ':not(:contains("Action"))'
+                        },
                         footer: true,
                         className: 'd-none btn btn-sm btn-success shadow rounded'
                     },
                     {
                         extend: 'pdfHtml5',
+                        exportOptions: {
+                            columns: ':not(:contains("Action"))'
+                        },
                         footer: true,
                         orientation: 'landscape',
                         className: 'd-none btn btn-sm btn-success shadow rounded'
                     },
                     {
                         extend: 'print',
+                        exportOptions: {
+                            columns: ':not(:contains("Action"))'
+                        },
                         footer: true,
                         orientation: 'landscape',
                         className: 'd-none btn btn-sm btn-success shadow rounded',

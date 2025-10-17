@@ -182,23 +182,24 @@
                                         <th class="text-uppercase text-secondary text-xs font-weight-bolder  ps-3">
                                             Awaiting <br> Response
                                         </th>
-                                        <th class="text-uppercase text-secondary text-xs font-weight-bolder  ps-3">
+                                        <th class="text-uppercase text-secondary text-xs font-weight-bolder  text-center" style="text-align: center">
                                             On Progress
                                         </th>
                                         <th class="text-uppercase text-secondary text-xs font-weight-bolder text-center">
                                             Repairing
                                         </th>
-                                        <th class="text-uppercase text-secondary text-xs font-weight-bolder text-center">
-                                            Overdue
-                                        </th>
+
                                         <th class="text-uppercase text-secondary text-xs font-weight-bolder text-center">
                                             Resolved
                                         </th>
-                                        <th class="text-uppercase text-secondary text-xs font-weight-bolder  ps-3">
+                                        <th class="text-uppercase text-secondary text-xs font-weight-bolder  text-center">
                                             Pending
                                         </th>
-                                        <th class="text-uppercase text-secondary text-xs font-weight-bolder  ps-3">
+                                        <th class="text-uppercase text-secondary text-xs font-weight-bolder  text-center">
                                             Total
+                                        </th>
+                                        <th class="text-uppercase text-secondary text-xs font-weight-bolder text-center">
+                                            Overdue
                                         </th>
                                     </tr>
                                 </thead>
@@ -209,11 +210,13 @@
                                             <td>{{$item->tickets->where('status','Awaiting Response')->count()}}</td>
                                             <td>{{$item->tickets->where('status','On Progress')->count()}}</td>
                                             <td>{{$item->tickets->where('status','Repairing')->count()}}</td>
-                                            <td>{{$item->tickets->where('status','Overdue')->count()}}</td>
+
                                             <td>{{$item->tickets->where('status','Resolved')->count()}}</td>
                                             <td>{{$item->tickets->where('status','Pending')->count()}}</td>
-                                            <td>{{$item->tickets()->where('status','On Progress')->whereRaw('DATE_ADD(sla_respone, INTERVAL sla_ticket_time MINUTE) < NOW()')->count()}}</td>
-
+                                            <td>{{$item->tickets()->where('status','!=','Closed')->count()}}</td>
+                                            <td>{{$item->tickets()->where('status','On Progress')
+                                                ->whereRaw('DATEADD(MINUTE, sla_ticket_time, sla_respone) < GETDATE()')->count()}}
+                                            </td>
                                         </tr>
                                     @endforeach
                                 </tbody>
@@ -253,6 +256,18 @@
             padding-left: 1rem;
             padding-right: 1rem;
         }
+        td {
+        text-align: center !important;
+    }
+    th {
+        text-align: center !important;
+    }
+    td:first-child {
+        text-align: left !important;
+    }
+    th:first-child {
+        text-align: left !important;
+    }
     </style>
 @endpush
 
@@ -292,7 +307,7 @@
 
                         customize: function(win) {
                             $(win.document.body).find('div.dataTables_wrapper').addClass('display')
-                                .html('text-align', 'center');
+                                .css('text-align', 'center');
 
                             //  $(win.document.body).find('div.dt-buttons').append('<button type="button" class="btn btn-sm btn-outline-primary"><i class="fas fa-filter"></i></button>');
                             $(win.document.body).find('th').addClass('display').css('text-align',
@@ -322,61 +337,6 @@
                 "bAutoWidth": false,
             });
 
-            $('.tableku').DataTable({
-                dom: 'Blfrtip',
-                "order": [],
-                "showNEntries": true,
-                buttons: [{
-                        extend: 'excelHtml5',
-                        footer: true,
-                        className: 'btn btn-sm btn-success shadow rounded'
-                    },
-                    {
-                        extend: 'csvHtml5',
-                        footer: true,
-                        className: 'btn btn-sm btn-success shadow rounded'
-                    },
-                    {
-                        extend: 'pdfHtml5',
-                        footer: true,
-                        orientation: 'landscape',
-                        className: 'btn btn-sm btn-success shadow rounded'
-                    },
-                    {
-                        extend: 'print',
-                        footer: true,
-                        orientation: 'landscape',
-                        className: 'btn btn-sm btn-success shadow rounded',
-
-                        customize: function(win) {
-                            $(win.document.body).find('div.dataTables_wrapper').addClass('display')
-                                .html('text-align', 'center');
-                            $(win.document.body).find('th').addClass('display').css('text-align',
-                                'center');
-                            $(win.document.body).find('th').addClass('display').css('color',
-                                '#000000');
-
-
-                            $(win.document.body).find('table').addClass('display').css('font-size',
-                                '16px');
-                            $(win.document.body).find('table').addClass('display').css('text-align',
-                                'center');
-                            $(win.document.body).find('tr:nth-child(odd) td').each(function(index) {
-                                // $(this).css('background-color', '#D0D0D0');
-                                $(this).css('color', '#000000');
-                            });
-                            $(win.document.body).find('h1').css('text-align', 'center');
-                            $(win.document.body).find('td').addClass('display').css('color',
-                                '#000000 !important');
-                        }
-                    }
-                ],
-                language: {
-                    'search': '' /*Empty to remove the label*/
-                },
-                "paging": true,
-                "bAutoWidth": false,
-            });
         });
 
 

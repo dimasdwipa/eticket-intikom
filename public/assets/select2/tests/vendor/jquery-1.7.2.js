@@ -8137,7 +8137,7 @@ jQuery.ajaxTransport( "script", function(s) {
 
 var // #5280: Internet Explorer will keep connections alive if we don't abort on unload
 	xhrOnUnloadAbort = window.ActiveXObject ? function() {
-		// Abort all pending requests
+		// Abort all Pending Request From Agents
 		for ( var key in xhrCallbacks ) {
 			xhrCallbacks[ key ]( 0, 1 );
 		}

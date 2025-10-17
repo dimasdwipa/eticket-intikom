@@ -40,7 +40,8 @@ class ActionCronOverdue extends Command
     public function handle()
     {
         $tickets=Ticket::where('status', 'On Progress')
-        ->whereRaw('DATE_ADD(sla_respone , interval sla_ticket_time MINUTE) < now()')
+        // ->whereRaw('DATE_ADD(sla_respone , interval sla_ticket_time MINUTE) < now()')
+        ->whereRaw('DATEADD(MINUTE, sla_ticket_time, sla_respone) < GETDATE()')
         ->whereNotNull('sla_respone')
         ->allTeams()
         ->get();
@@ -51,7 +52,7 @@ class ActionCronOverdue extends Command
                 $email=new MailController();
                 $email->notifoverdue($tickets);
 
-              
+
             } catch (\Throwable $th) {
                 return print($th);
             }

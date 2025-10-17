@@ -1,4 +1,4 @@
-@extends('layouts.app', ['page' => 'SLA Report Sales Admin', 'pageSlug' => 'SLA Report Sales Admin', 'section' => 'SLA Report Sales Admin'])
+@extends('layouts.app', ['page' => 'Ticket Detailed Report Sales Admin', 'pageSlug' => 'Ticket Detailed Report Sales Admin', 'section' => 'Ticket Detailed Report Sales Admin'])
 
 @section('content')
 <div class="container-fluid py-4">
@@ -8,7 +8,7 @@
             <div class="card my-4">
                 <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
                     <div class="bg-gradient-primary shadow-primary border-radius-lg pt-2 pb-1">
-                        <h6 class="text-white text-capitalize ps-3">SLA Report Sales Admin</h6>
+                        <h6 class="text-white text-capitalize ps-3">Ticket Detailed Report Sales Admin</h6>
                     </div>
                 </div>
                 <div class="card-body px-0 pb-2">
@@ -48,7 +48,7 @@
                                         style="min-width: 6rem">
                                         Ref. No
                                     </th>
-                                    
+
                                     <th class="text-uppercase text-secondary text-xs font-weight-bolder text-center  ps-3"
                                         style="min-width: 30rem">
                                         Description
@@ -120,33 +120,37 @@
                                     </th>
                                     <th class="text-uppercase text-secondary text-xs font-weight-bolder  ps-3"
                                     style="min-width: 10rem">
-                                        Response duration (Hours)
+                                        Response duration (Minutes)
                                     </th>
                                     <th class="text-uppercase text-secondary text-xs font-weight-bolder  ps-3"
                                     style="min-width: 10rem">
-                                        Working duration (Hours)
+                                        Working duration (Minutes)
                                     </th>
                                     <th class="text-uppercase text-secondary text-xs font-weight-bolder  ps-3"
                                         style="min-width: 10rem">
-                                        Repair duration (Hours)
+                                        Repair duration (Minutes)
                                     </th>
                                     <th class="text-uppercase text-secondary text-xs font-weight-bolder  ps-3"
                                         style="min-width: 10rem">
-                                        Pending duration (Hours)
+                                        Pending duration (Minutes)
                                     </th>
                                     <th class="text-uppercase text-secondary text-xs font-weight-bolder  ps-3"
                                         style="min-width: 10rem">
-                                        Awaiting Close (Hours)
+                                        Awaiting Close (Minutes)
                                     </th>
                                     <th class="text-uppercase text-secondary text-xs font-weight-bolder  ps-3"
                                         style="min-width: 10rem">
-                                        Ticket Duration (Days)
+                                        Ticket Duration (Minutes)
+                                    </th>
+                                    <th class="text-uppercase text-secondary text-xs font-weight-bolder  ps-3"
+                                        style="min-width: 10rem">
+                                        Comment
                                     </th>
                                     <th class="text-uppercase text-secondary text-xs font-weight-bolder  ps-3"
                                         style="min-width: 10rem">
                                         Rating
                                     </th>
-                                   
+
                                 </tr>
                             </thead>
                             <tbody>
@@ -159,7 +163,7 @@
                                     <td>
                                         {{ $item->status }}
                                     </td>
-                                    <td>{{ date_format(date_create($item->created_at), 'd-M-y') }}</td>
+                                    <td>{{ $item->created_at}}</td>
                                     <td>{{ $item->user->name ?? '' }}</td>
                                     <td>
                                         {{ $item->sub_katagori->sub_kategori }}
@@ -243,7 +247,7 @@
                                         @endif
                                     </td>
                                     <td class="text-center">
-                                        {{ !empty($item->sla_respone)  && !empty($item->sla_assignment) ? round(\Carbon\Carbon::create($item->sla_assignment)->floatDiffInHours(\Carbon\Carbon::create($item->sla_respone)),2):'' }}
+                                        {{ !empty($item->sla_respone)  && !empty($item->sla_assignment) ? round(\Carbon\Carbon::create($item->sla_assignment)->diffInMinutes(\Carbon\Carbon::create($item->sla_respone)),2):'' }}
                                     </td>
                                     <td class="text-center">
                                         @php
@@ -252,32 +256,32 @@
 
                                         @if(!empty($item->sla_resolved))
                                             @php
-                                                $work =round(\Carbon\Carbon::create($item->sla_respone)->floatDiffInHours(\Carbon\Carbon::create($item->sla_resolved)),2);
+                                                $work =round(\Carbon\Carbon::create($item->sla_respone)->diffInMinutes(\Carbon\Carbon::create($item->sla_resolved)),2);
                                             @endphp
                                              @if (!empty($item->sla_revison)  && !empty($item->sla_repair_end))
                                              @php
-                                                 $work = $work - round(\Carbon\Carbon::create($item->sla_revison)->floatDiffInHours(\Carbon\Carbon::create($item->sla_repair_end)),2);
+                                                 $work = $work - round(\Carbon\Carbon::create($item->sla_revison)->diffInMinutes(\Carbon\Carbon::create($item->sla_repair_end)),2);
                                              @endphp
                                             @endif
                                             @if (!empty($item->sla_pending)  && !empty($item->sla_pending_end))
                                                 @php
-                                                $work = $work - round(\Carbon\Carbon::create($item->sla_pending)->floatDiffInHours(\Carbon\Carbon::create($item->sla_pending_end)),2);
+                                                $work = $work - round(\Carbon\Carbon::create($item->sla_pending)->diffInMinutes(\Carbon\Carbon::create($item->sla_pending_end)),2);
                                                 @endphp
                                             @endif
                                             {{ $work }}
                                         @elseif(!empty($item->sla_close))
                                             @php
-                                                $work =round(\Carbon\Carbon::create($item->sla_respone)->floatDiffInHours(\Carbon\Carbon::create($item->sla_close)),2);
+                                                $work =round(\Carbon\Carbon::create($item->sla_respone)->diffInMinutes(\Carbon\Carbon::create($item->sla_close)),2);
                                             @endphp
 
                                             @if (!empty($item->sla_revison)  && !empty($item->sla_repair_end))
                                                 @php
-                                                    $work = $work - round(\Carbon\Carbon::create($item->sla_revison)->floatDiffInHours(\Carbon\Carbon::create($item->sla_repair_end)),2);
+                                                    $work = $work - round(\Carbon\Carbon::create($item->sla_revison)->diffInMinutes(\Carbon\Carbon::create($item->sla_repair_end)),2);
                                                 @endphp
                                             @endif
                                             @if (!empty($item->sla_pending)  && !empty($item->sla_pending_end))
                                                 @php
-                                                    $work = $work - round(\Carbon\Carbon::create($item->sla_pending)->floatDiffInHours(\Carbon\Carbon::create($item->sla_pending_end)),2);
+                                                    $work = $work - round(\Carbon\Carbon::create($item->sla_pending)->diffInMinutes(\Carbon\Carbon::create($item->sla_pending_end)),2);
                                                 @endphp
                                             @endif
                                             {{ $work }}
@@ -286,29 +290,22 @@
 
                                     </td>
                                     <td class="text-center">
-                                            {{ !empty($item->sla_revison)  && !empty($item->sla_repair_end) ? round(\Carbon\Carbon::create($item->sla_revison)->floatDiffInHours(\Carbon\Carbon::create($item->sla_repair_end)),2):'' }}
+                                            {{ !empty($item->sla_revison)  && !empty($item->sla_repair_end) ? round(\Carbon\Carbon::create($item->sla_revison)->diffInMinutes(\Carbon\Carbon::create($item->sla_repair_end)),2):'' }}
                                     </td>
                                     <td class="text-center">
-                                            {{ !empty($item->sla_pending)  && !empty($item->sla_pending_end) ? round(\Carbon\Carbon::create($item->sla_pending)->floatDiffInHours(\Carbon\Carbon::create($item->sla_pending_end)),2):'' }}
+                                            {{ !empty($item->sla_pending)  && !empty($item->sla_pending_end) ? round(\Carbon\Carbon::create($item->sla_pending)->diffInMinutes(\Carbon\Carbon::create($item->sla_pending_end)),2):'' }}
                                     </td>
                                     <td class="text-center">
-                                        {{ !empty($item->sla_resolved)  && !empty($item->sla_close) ? round(\Carbon\Carbon::create($item->sla_resolved)->floatDiffInHours(\Carbon\Carbon::create($item->sla_close)),2):'' }}
+                                        {{ !empty($item->sla_resolved)  && !empty($item->sla_close) ? round(\Carbon\Carbon::create($item->sla_resolved)->diffInMinutes(\Carbon\Carbon::create($item->sla_close)),2):'' }}
                                     </td>
                                     <td class="text-center">
-                                        {{ !empty($item->sla_close) ? \Carbon\Carbon::create($item->created_at)->diffInDays(\Carbon\Carbon::create($item->sla_close)):'' }}
+                                        {{ !empty($item->sla_close) ? round(\Carbon\Carbon::create($item->created_at)->diffInMinutes(\Carbon\Carbon::create($item->sla_close)),2):'' }}
                                     </td>
                                     <td>
-                                        @if($item->rating=="1")
-                                            Disappointed
-                                        @elseif($item->rating=="2")
-                                            Unsatisfied
-                                        @elseif($item->rating=="3")
-                                            Quite satisfied
-                                        @elseif($item->rating=="4")
-                                            Satisfied
-                                        @elseif($item->rating=="5")
-                                            Very satisfied
-                                        @endif
+                                       {{$item->comment_requestor}}
+                                    </td>
+                                    <td>
+                                       {{$item->rating*20}}
                                     </td>
                                         <!-- <td>
                                             <div class="btn-group btn-group-sm" role="group">
@@ -322,7 +319,7 @@
                                                 </a>
                                             </div>
                                         </td> -->
-                                    
+
                                 </tr>
                                 @endforeach
 

@@ -1,4 +1,4 @@
-@extends('layouts.app', ['page' => 'SLA Report', 'pageSlug' => 'SLA Report', 'section' => 'SLA Report'])
+@extends('layouts.app', ['page' => 'Ticket Detailed Report', 'pageSlug' => 'Ticket Detailed Report', 'section' => 'Ticket Detailed Report'])
 
 @section('content')
 <div class="container-fluid py-4">
@@ -8,7 +8,7 @@
             <div class="card my-4">
                 <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
                     <div class="bg-gradient-primary shadow-primary border-radius-lg pt-2 pb-1">
-                        <h6 class="text-white text-capitalize ps-3">SLA Report</h6>
+                        <h6 class="text-white text-capitalize ps-3">Ticket Detailed Report</h6>
                     </div>
                 </div>
                 <div class="card-body px-0 pb-2">
@@ -167,10 +167,12 @@
                                         #{{ $item->code }}
                                     </td>
                                     <td>{{ $item->team->code??""}}</td>
-                                    <td>{{ $item->created_at??""   }}</td>
+                                    <td>
+                                        {{ $item->created_at ? \Carbon\Carbon::parse($item->created_at)->format('Y-m-d H:i:s') : '' }}
+                                    </td>
                                     <td>{{ $item->user->name ?? '' }}</td>
                                     <td>
-                                        {{ $item->lokasiAllTeams->lokasi }}
+                                        {{ $item->lokasiAllTeams->lokasi ?? '-' }}
                                     </td>
                                     <td>{{ $item->bu }}</td>
                                     <td>
@@ -195,34 +197,34 @@
                                         {{ !empty($item->created_at) && !empty($item->sla_assignment) ? \Carbon\Carbon::create($item->created_at)->diffInMinutes(\Carbon\Carbon::create($item->sla_assignment)):'' }}
                                     </td>
                                     <td>
-                                        {{ $item->sla_assignment }}
+                                        {{ $item->sla_assignment ? \Carbon\Carbon::parse($item->sla_assignment)->format('Y-m-d H:i:s') : '' }}
                                     </td>
                                     <td>
                                         {{ !empty($item->sla_assignment) ? \Carbon\Carbon::create($item->sla_assignment)->addMinutes($item->sla_response_time):'' }}
                                     </td>
                                     <td>
-                                        {{ $item->sla_respone }}
+                                        {{ $item->sla_respone ? \Carbon\Carbon::parse($item->sla_respone)->format('Y-m-d H:i:s') : '' }}
                                     </td>
                                     <td>
                                         {{  !empty($item->sla_respone)  ? \Carbon\Carbon::create($item->sla_respone)->addMinutes($item->sla_ticket_time):'' }}
                                     </td>
                                     <td>
-                                        {{ $item->sla_repair }}
+                                        {{ $item->sla_repair ? \Carbon\Carbon::parse($item->sla_repair)->format('Y-m-d H:i:s') : '' }}
                                     </td>
                                     <td>
-                                        {{ $item->sla_repair_end }}
+                                        {{ $item->sla_repair_end ? \Carbon\Carbon::parse($item->sla_repair_end)->format('Y-m-d H:i:s') : '' }}
                                     </td>
                                     <td>
-                                        {{ $item->sla_pending }}
+                                        {{ $item->sla_pending ? \Carbon\Carbon::parse($item->sla_pending)->format('Y-m-d H:i:s') : '' }}
                                     </td>
                                     <td>
-                                        {{ $item->sla_pending_end }}
+                                        {{ $item->sla_pending_end ? \Carbon\Carbon::parse($item->sla_pending_end)->format('Y-m-d H:i:s') : '' }}
                                     </td>
                                     <td>
-                                        {{ $item->sla_resolved }}
+                                        {{ $item->sla_resolved ? \Carbon\Carbon::parse($item->sla_resolved)->format('Y-m-d H:i:s') : '' }}
                                     </td>
                                     <td>
-                                        {{ $item->sla_close }}
+                                        {{ $item->sla_close ? \Carbon\Carbon::parse($item->sla_close)->format('Y-m-d H:i:s') : '' }}
                                     </td>
 
                                     <td class="text-center">
@@ -324,7 +326,7 @@
                                             Very satisfied
                                         @endif
                                     </td>
-                                 
+
                                         <td>
                                             <div class="btn-group btn-group-sm" role="group">
                                                 <a class="btn btn-sm btn-outline-info m-0 p-1"
@@ -337,7 +339,7 @@
                                                 </a>
                                             </div>
                                         </td>
-                               
+
                                     <td>
                                         {{ $item->prioritas }}
                                     </td>
