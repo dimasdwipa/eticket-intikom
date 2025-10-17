@@ -99,33 +99,33 @@
                                         <th
                                             class="text-uppercase text-secondary text-xs font-weight-bolder text-center  ps-3">
                                             Created</th>
-                                        <th class="text-uppercase text-secondary text-xs font-weight-bolder  ps-3">
+                                        {{-- <th class="text-uppercase text-secondary text-xs font-weight-bolder  ps-3">
                                             Category
-                                        </th>
-                                        <th class="text-uppercase text-secondary text-xs font-weight-bolder  ps-3">
+                                        </th> --}}
+                                        {{-- <th class="text-uppercase text-secondary text-xs font-weight-bolder  ps-3">
                                             Sub Category
-                                        </th>
+                                        </th> --}}
                                         <th>
                                             Assigned To
                                         </th>
                                         <th class="text-uppercase text-secondary text-xs font-weight-bolder  ps-3">
                                             Problem
                                         </th>
-                                        <th class="text-uppercase text-secondary text-xs font-weight-bolder  ps-3">
+                                        {{-- <th class="text-uppercase text-secondary text-xs font-weight-bolder  ps-3">
                                             Solution
-                                        </th>
-                                        <th class="text-uppercase text-secondary text-xs font-weight-bolder  ps-3">
+                                        </th> --}}
+                                        {{-- <th class="text-uppercase text-secondary text-xs font-weight-bolder  ps-3">
                                             Note
-                                        </th>
-                                        <th class="text-uppercase text-secondary text-xs font-weight-bolder text-center">
+                                        </th> --}}
+                                        {{-- <th class="text-uppercase text-secondary text-xs font-weight-bolder text-center">
                                             Estimation
-                                        </th>
-                                        <th class="text-uppercase text-secondary text-xs font-weight-bolder text-center">
+                                        </th> --}}
+                                        {{-- <th class="text-uppercase text-secondary text-xs font-weight-bolder text-center">
                                             Resolved
-                                        </th>
-                                        <th class="text-uppercase text-secondary text-xs font-weight-bolder text-center">
+                                        </th> --}}
+                                        {{-- <th class="text-uppercase text-secondary text-xs font-weight-bolder text-center">
                                             Closed
-                                        </th>
+                                        </th> --}}
                                         <th class="text-uppercase text-secondary text-xs font-weight-bolder text-center">
                                             File
                                         </th>
@@ -140,26 +140,6 @@
                             </table>
                         </div>
                     </div>
-                </div>
-            </div>
-            <div id="sidebar_data" style="display:none" class="col-3">
-                <div class="card shadow-lg">
-                <div class="card-header pb-0 pt-3">
-                    <div class="text-right">
-                        <button class="btn btn-link text-dark p-0 m-0 fixed-plugin-close-button" id="close_sidebar_data">
-                            <i class="material-icons">clear</i>
-                        </button>
-                    </div>
-                    <div class="float-start">
-                    <h6 class="mt-1 mb-0">Data Ticket</h6>
-                    </div>
-
-                    <!-- End Toggle Button -->
-                </div>
-                <hr class="horizontal dark my-1">
-                <div id="sidebar_data_body" class="card-body pt-sm-3 pt-0">
-
-                </div>
                 </div>
             </div>
         </div>
@@ -408,6 +388,23 @@
             </div>
         </div>
     </div>
+    <div class="modal fade" id="detailDataModal" tabindex="-1" aria-labelledby="detailDataModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="detailDataModalLabel">Detail Ticket</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="detailModalBody">
+                    {{-- Konten detail akan dimasukkan di sini oleh JavaScript --}}
+                    <p class="text-center">Loading...</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
 @endpush
 @push('scripts')
 {{-- CSS tambahan untuk memberi jarak antara tombol dan search box --}}
@@ -466,9 +463,24 @@ $(document).ready(function() {
             { "data": "status" },
             { "data": "code", "name": "tickets.code" },
             { "data": "team.name", "name": "team.name", "defaultContent": "-" },
-            { "data": "created_at", "name": "tickets.created_at" },
-            { "data": "katagori.kategori", "defaultContent": "-" },
-            { "data": "sub_katagori.sub_kategori", "defaultContent": "-" },
+            {
+                "data": "created_at",
+                "name": "tickets.created_at",
+                "render": function(data, type, row) {
+                    // 'data' adalah nilai dari 'created_at' (contoh: "2025-10-17T13:59:20.000000Z")
+                    if (data) {
+                        // Gunakan fungsi bawaan JavaScript untuk memformat tanggal ke format Indonesia
+                        return new Date(data).toLocaleDateString('id-ID', {
+                            day: 'numeric',
+                            month: 'long',
+                            year: 'numeric'
+                        });
+                    }
+                    return ''; // Kembalikan string kosong jika datanya null
+                }
+            },
+            // { "data": "katagori.kategori", "defaultContent": "-" },
+            // { "data": "sub_katagori.sub_kategori", "defaultContent": "-" },
             { "data": "agent.name", "name": "agent.name", "defaultContent": "-" },
             { 
                 "data": "problem", "orderable": false, "searchable": false,
@@ -476,11 +488,11 @@ $(document).ready(function() {
                     return `<button type="button" class="btn btn-sm btn-outline-info" data-bs-toggle="modal" data-bs-target="#Detail" data-problem="${data}">DETAIL</button>`;
                 }
             },
-            { "data": "solution", "defaultContent": "-" },
-            { "data": "note", "defaultContent": "-" },
-            { "data": "estimation_date", "defaultContent": "-" },
-            { "data": "resolved_date", "defaultContent": "-" },
-            { "data": "closed_date", "defaultContent": "-" },
+            // { "data": "solution", "defaultContent": "-" },
+            // { "data": "note", "defaultContent": "-" },
+            // { "data": "estimation_date", "defaultContent": "-" },
+            // { "data": "resolved_date", "defaultContent": "-" },
+            // { "data": "closed_date", "defaultContent": "-" },
             { 
                 "data": "files", "orderable": false, "searchable": false,
                 "render": function(data, type, row) {
@@ -591,39 +603,41 @@ $(document).ready(function() {
         }
     });
 
-    // Logika Sidebar
-    $('#close_sidebar_data').click(function() {
-        $('#sidebar_data').hide();
-        $('#table_data').removeClass('col-9').addClass('col-12');
-    });
-
     // 4. Event listener untuk row click yang di-delegasikan (agar berfungsi di semua halaman)
     $('.tableku tbody').on('click', 'tr', function (event) {
-        // Jangan aktifkan sidebar jika yang diklik adalah tombol atau link di dalam sel
-        if ($(event.target).is('button, a, i')) {
+        // Jangan buka modal jika yang diklik adalah tombol, link, atau input di dalam sel
+        if ($(event.target).is('button, a, i, input')) {
             return;
         }
 
-        $('#sidebar_data').show();
-        $('#table_data').removeClass('col-12').addClass('col-9');
+        // Ambil data dari baris yang diklik langsung dari objek DataTables (lebih cepat & andal)
+        var rowData = table.row(this).data();
         
-        var header = [];
-        var content = "<table class='table table-sm'>"; // Beri class agar lebih rapi
-        var cells = $(this).find('td');
+        if (rowData) {
+            // Siapkan konten HTML untuk ditampilkan di dalam modal
+            var content = "<table class='table table-sm table-striped'>";
+            
+            // Tampilkan data yang paling penting
+            content += `<tr><td class="fw-bold" style="width: 30%;">Status</td><td>:</td><td>${rowData.status}</td></tr>`;
+            content += `<tr><td class="fw-bold">#Ticket</td><td>:</td><td>${rowData.code}</td></tr>`;
+            content += `<tr><td class="fw-bold">Tenant</td><td>:</td><td>${rowData.team ? rowData.team.name : '-'}</td></tr>`;
+            content += `<tr><td class="fw-bold">Created</td><td>:</td><td>${new Date(rowData.created_at).toLocaleString('id-ID', { dateStyle: 'long', timeStyle: 'short' })}</td></tr>`;
+            content += `<tr><td class="fw-bold">Category</td><td>:</td><td>${rowData.katagori ? rowData.katagori.kategori : '-'}</td></tr>`;
+            content += `<tr><td class="fw-bold">Sub Category</td><td>:</td><td>${rowData.sub_katagori ? rowData.sub_katagori.sub_kategori : '-'}</td></tr>`;
+            content += `<tr><td class="fw-bold">Assigned To</td><td>:</td><td>${rowData.agent ? rowData.agent.name : '-'}</td></tr>`;
+            content += `<tr><td class="fw-bold">Problem</td><td>:</td><td>${rowData.problem}</td></tr>`;
+            content += `<tr><td class="fw-bold">Priority</td><td>:</td><td>${rowData.prioritas}</td></tr>`;
+            // Anda bisa tambahkan field lain di sini jika perlu
 
-        $('.tableku thead th').each(function() {
-            header.push($(this).text().trim());
-        });
-        
-        cells.each(function(index) {
-            // Jangan tampilkan kolom 'Action' di sidebar
-            if (header[index] && header[index].toLowerCase() !== 'action') {
-                content += `<tr><td class="fw-bold">${header[index]}</td><td>&nbsp;:&nbsp;</td><td>${$(this).html()}</td></tr>`;
-            }
-        });
+            content += "</table>";
 
-        content += "</table>";
-        $('#sidebar_data_body').html(content);
+            // Masukkan konten ke dalam body modal
+            $('#detailModalBody').html(content);
+
+            // Tampilkan modal
+            var detailModal = new bootstrap.Modal(document.getElementById('detailDataModal'));
+            detailModal.show();
+        }
     });
 });
 </script>
