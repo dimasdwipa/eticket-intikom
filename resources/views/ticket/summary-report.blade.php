@@ -108,9 +108,9 @@
                                         <th>
                                             Assigned To
                                         </th>
-                                        <th class="text-uppercase text-secondary text-xs font-weight-bolder  ps-3">
+                                        {{-- <th class="text-uppercase text-secondary text-xs font-weight-bolder  ps-3">
                                             Problem
-                                        </th>
+                                        </th> --}}
                                         {{-- <th class="text-uppercase text-secondary text-xs font-weight-bolder  ps-3">
                                             Solution
                                         </th> --}}
@@ -148,7 +148,7 @@
 
 @push('modal')
     <!-- Detail -->
-    <div class="modal fade" id="Detail" tabindex="-1" role="dialog" aria-labelledby="Detail" aria-hidden="true">
+    {{-- <div class="modal fade" id="Detail" tabindex="-1" role="dialog" aria-labelledby="Detail" aria-hidden="true">
         <div class="modal-dialog modal-danger modal-dialog-centered modal-" role="document">
             <div class="modal-content">
                 <div class="modal-header py-2 bg-info">
@@ -166,7 +166,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> --}}
     <!-- filter -->
     <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
@@ -482,12 +482,12 @@ $(document).ready(function() {
             // { "data": "katagori.kategori", "defaultContent": "-" },
             // { "data": "sub_katagori.sub_kategori", "defaultContent": "-" },
             { "data": "agent.name", "name": "agent.name", "defaultContent": "-" },
-            { 
-                "data": "problem", "orderable": false, "searchable": false,
-                "render": function(data, type, row) {
-                    return `<button type="button" class="btn btn-sm btn-outline-info" data-bs-toggle="modal" data-bs-target="#Detail" data-problem="${data}">DETAIL</button>`;
-                }
-            },
+            // { 
+            //     "data": "problem", "orderable": false, "searchable": false,
+            //     "render": function(data, type, row) {
+            //         return `<button type="button" class="btn btn-sm btn-outline-info" data-bs-toggle="modal" data-bs-target="#Detail" data-problem="${data}">DETAIL</button>`;
+            //     }
+            // },
             // { "data": "solution", "defaultContent": "-" },
             // { "data": "note", "defaultContent": "-" },
             // { "data": "estimation_date", "defaultContent": "-" },
@@ -627,7 +627,11 @@ $(document).ready(function() {
             content += `<tr><td class="fw-bold">Assigned To</td><td>:</td><td>${rowData.agent ? rowData.agent.name : '-'}</td></tr>`;
             content += `<tr><td class="fw-bold">Problem</td><td>:</td><td>${rowData.problem}</td></tr>`;
             content += `<tr><td class="fw-bold">Priority</td><td>:</td><td>${rowData.prioritas}</td></tr>`;
-            // Anda bisa tambahkan field lain di sini jika perlu
+            content += `<tr><td class="fw-bold">Solution</td><td>:</td><td>${rowData.solution}</td></tr>`;
+            content += `<tr><td class="fw-bold">Note</td><td>:</td><td>${rowData.note}</td></tr>`;
+            content += `<tr><td class="fw-bold">Estimation Date</td><td>:</td><td>${rowData.estimation_date}</td></tr>`;
+            content += `<tr><td class="fw-bold">Resolved Date</td><td>:</td><td>${rowData.resolved_date}</td></tr>`;
+            content += `<tr><td class="fw-bold">Closed Date</td><td>:</td><td>${rowData.closed_date}</td></tr>`;
 
             content += "</table>";
 
