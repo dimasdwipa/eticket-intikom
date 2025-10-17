@@ -557,6 +557,11 @@ $(document).ready(function() {
         "bAutoWidth": false,
     });
 
+    $('.dataTables_filter input').attr('placeholder', 'Search...');
+    $('.dataTables_filter label').contents().filter(function(){
+        return (this.nodeType == 3);
+    }).remove(); // Hapus teks 'Search:' bawaan DataTables
+
     // =================================================================
     // 2. Hubungkan Form Filter ke DataTable
     // =================================================================
