@@ -410,212 +410,221 @@
     </div>
 @endpush
 @push('scripts')
-    <script>
-        $(document).ready(function() {
-        $('.tableku').DataTable({
-            "processing": true,
-            "serverSide": true,
-            "ajax": "{{ route('api.summary-report') }}",
+{{-- CSS tambahan untuk memberi jarak antara tombol dan search box --}}
+<style>
+    div.dataTables_wrapper div.dataTables_filter {
+        margin-top: 0.5rem; /* Memberi sedikit jarak atas untuk search box */
+        text-align: right; /* Memastikan search box tetap di kanan */
+    }
+</style>
+<script>
+$(document).ready(function() {
+    // =================================================================
+    // 1. Inisialisasi DataTable dengan Filter AJAX & Tampilan Rapi
+    // =================================================================
+    var table = $('.tableku').DataTable({
+        "processing": true,
+        "serverSide": true,
+        
+        // Kirim data dari form filter bersama setiap request AJAX
+        "ajax": {
+            "url": "{{ route('api.summary-report') }}",
+            "type": "GET",
+            "data": function (d) {
+                // Ambil nilai dari setiap input di form filter
+                d.start_date = $('#start_date').val();
+                d.end_date = $('#end_date').val();
+                d.filter_by = $('select[name="filter_by"]').val();
+                d.keyword = $('#keyword').val();
+                d.team_id = $('select[name="team_id"]').val();
+            }
+        },
 
-            "columns": [
-                {
-                    "data": null,
-                    "orderable": false,
-                    "searchable": false,
-                    "render": function(data, type, row) {
-                        let buttons = '';
-                        if (row.status === 'Resolved') {
-                            buttons += `<button type="button" class="btn btn-sm btn-success m-1">CLOSE</button>`;
-                            buttons += `<button type="button" class="btn btn-sm btn-warning m-1">COMPLAIN</button>`;
-                        } else if (row.status !== 'Closed' && row.status !== 'Canceled') {
-                            buttons += `<button type="button" class="btn btn-sm btn-outline-success m-1" data-bs-toggle="modal" data-bs-target="#close" data-id="${row.id}">Close</button>`;
-                            buttons += `<button type="button" class="btn btn-sm btn-outline-warning m-1" data-bs-toggle="modal" data-bs-target="#complain" data-id="${row.id}">Complain</button>`;
-                        }
-                        if ((row.status === 'Closed' || row.status === 'Canceled') && !row.rating) {
-                            buttons += `<button type="button" class="btn btn-sm btn-outline-secondary m-1" data-bs-toggle="modal" data-bs-target="#rating" data-id="${row.id}">Give Rating</button>`;
-                        }
-                        return `<div class="btn-group" role="group">${buttons}</div>`;
+        // Definisi kolom dari JSON
+        "columns": [
+            {
+                "data": null, "orderable": false, "searchable": false,
+                "render": function(data, type, row) {
+                    let buttons = '';
+                    // Ambil data dari relasi dengan aman (cek jika null)
+                    let katagoriName = row.katagori ? row.katagori.kategori : '';
+                    let agentName = row.agent ? row.agent.name : '';
+
+                    if (row.status === 'Resolved') {
+                         buttons += `<button type="button" class="btn btn-sm btn-success m-1" data-bs-toggle="modal" data-bs-target="#close" data-id="${row.id}">CLOSE</button>`;
+                         buttons += `<button type="button" class="btn btn-sm btn-warning m-1" data-bs-toggle="modal" data-bs-target="#complain" data-id="${row.id}" data-code="${row.code}" data-katagori="${katagoriName}" data-status="${row.status}" data-agent="${agentName}">COMPLAIN</button>`;
+                    } else if (row.status !== 'Closed' && row.status !== 'Canceled') {
+                        buttons += `<button type="button" class="btn btn-sm btn-outline-success m-1" data-bs-toggle="modal" data-bs-target="#close" data-id="${row.id}">Close</button>`;
+                        buttons += `<button type="button" class="btn btn-sm btn-outline-warning m-1" data-bs-toggle="modal" data-bs-target="#complain" data-id="${row.id}" data-code="${row.code}" data-katagori="${katagoriName}" data-status="${row.status}" data-agent="${agentName}">Complain</button>`;
                     }
-                },
-                { "data": "status" },
-                { "data": "code", "name": "tickets.code" },
-                { "data": "team.name", "name": "team.name", "defaultContent": "-" },
-                { "data": "created_at", "name": "tickets.created_at" },
-                { "data": "katagori.kategori", "defaultContent": "-" },
-                { "data": "sub_katagori.sub_kategori", "defaultContent": "-" },
-                { "data": "agent.name", "name": "agent.name", "defaultContent": "-" },
-                
-                // VVV PERBAIKAN KOLOM PROBLEM VVV
-                { 
-                    "data": "problem",
-                    "render": function(data, type, row) {
-                        // "data" di sini berisi nilai dari row.problem
-                        return `<button type="button" class="btn btn-sm btn-outline-info" data-bs-toggle="modal" data-bs-target="#Detail" data-problem="${data}">DETAIL</button>`;
+                    if ((row.status === 'Closed' || row.status === 'Canceled') && !row.rating) {
+                        buttons += `<button type="button" class="btn btn-sm btn-outline-secondary m-1" data-bs-toggle="modal" data-bs-target="#rating" data-id="${row.id}">Give Rating</button>`;
                     }
-                },
-                // ^^^ AKHIR PERBAIKAN ^^^
-
-                { "data": "solution", "defaultContent": "-" },
-                { "data": "note", "defaultContent": "-" },
-                { "data": "estimation_date", "defaultContent": "-" },
-                { "data": "resolved_date", "defaultContent": "-" },
-                { "data": "closed_date", "defaultContent": "-" },
-
-                // VVV PERBAIKAN KOLOM FILE VVV
-                { 
-                    "data": "files", 
-                    "orderable": false, 
-                    "searchable": false,
-                    "render": function(data, type, row) {
-                        // "data" di sini berisi nama file dari row.files
-                        if (data) { // Hanya tampilkan tombol jika ada nama filenya
-                            let fileUrl = '/storage/files/tickets/' + data;
-                            return `
-                                <div class="btn-group btn-group-sm" role="group">
-                                    <a href="${fileUrl}" target="_blank" class="btn btn-sm btn-outline-info m-0 p-1">SHOW</a>
-                                    <a href="${fileUrl}" download class="btn btn-sm btn-outline-success m-0 p-1">DOWNLOAD</a>
-                                </div>
-                            `;
-                        }
-                        return '-'; // Tampilkan strip jika tidak ada file
+                    return `<div class="btn-group" role="group">${buttons}</div>`;
+                }
+            },
+            { "data": "status" },
+            { "data": "code", "name": "tickets.code" },
+            { "data": "team.name", "name": "team.name", "defaultContent": "-" },
+            { "data": "created_at", "name": "tickets.created_at" },
+            { "data": "katagori.kategori", "defaultContent": "-" },
+            { "data": "sub_katagori.sub_kategori", "defaultContent": "-" },
+            { "data": "agent.name", "name": "agent.name", "defaultContent": "-" },
+            { 
+                "data": "problem", "orderable": false, "searchable": false,
+                "render": function(data, type, row) {
+                    return `<button type="button" class="btn btn-sm btn-outline-info" data-bs-toggle="modal" data-bs-target="#Detail" data-problem="${data}">DETAIL</button>`;
+                }
+            },
+            { "data": "solution", "defaultContent": "-" },
+            { "data": "note", "defaultContent": "-" },
+            { "data": "estimation_date", "defaultContent": "-" },
+            { "data": "resolved_date", "defaultContent": "-" },
+            { "data": "closed_date", "defaultContent": "-" },
+            { 
+                "data": "files", "orderable": false, "searchable": false,
+                "render": function(data, type, row) {
+                    if (data) {
+                        let fileUrl = '/storage/files/tickets/' + data;
+                        return `
+                            <div class="btn-group btn-group-sm" role="group">
+                                <a href="${fileUrl}" target="_blank" class="btn btn-sm btn-outline-info m-0 p-1">SHOW</a>
+                                <a href="${fileUrl}" download class="btn btn-sm btn-outline-success m-0 p-1">DOWNLOAD</a>
+                            </div>
+                        `;
                     }
-                },
-                // ^^^ AKHIR PERBAIKAN ^^^
-                
-                { "data": "prioritas" }
-            ],
+                    return '-';
+                }
+            },
+            { "data": "prioritas" }
+        ],
 
-            dom: 'Blfrtip',
-            "order": [],
-            buttons: [ 'excelHtml5', 'csvHtml5', 'pdfHtml5', 'print' ],
-            language: { 'search': '' },
-            "paging": true,
-            "bAutoWidth": false,
-        });
+        // Tata letak elemen tabel yang rapi
+        dom:  '<"row mx-2"' +
+              '    <"col-sm-12 col-md-6" l>' +
+              '    <"col-sm-12 col-md-6" <"d-flex flex-column align-items-end" B f>>' +
+              '>' +
+              't' +
+              '<"row mx-2"' +
+              '    <"col-sm-12 col-md-5" i>' +
+              '    <"col-sm-12 col-md-7" p>' +
+              '>',
+        
+        "order": [],
+        buttons: [
+            {
+                text: 'Filter',
+                className: 'btn btn-sm btn-white btn-outline-primary shadow rounded me-1', // Jarak diubah ke me-1
+                action: function ( e, dt, node, config ) {
+                    $('#exampleModal').modal('show');
+                }
+            },
+            {
+                extend: 'excelHtml5',
+                text: 'Excel',
+                className: 'btn btn-sm btn-success shadow rounded me-1' // Jarak diubah ke me-1
+            },
+            {
+                extend: 'csvHtml5',
+                text: 'CSV',
+                className: 'btn btn-sm btn-success shadow rounded me-1' // Jarak diubah ke me-1
+            },
+            {
+                extend: 'pdfHtml5',
+                text: 'PDF',
+                className: 'btn btn-sm btn-success shadow rounded me-1' // Jarak diubah ke me-1
+            },
+            {
+                extend: 'print',
+                text: 'Print',
+                className: 'btn btn-sm btn-success shadow rounded' // Tombol terakhir tidak perlu jarak
+            }
+        ],
+        language: { 'search': '' },
+        "paging": true,
+        "bAutoWidth": false,
     });
 
-        $('#Detail').on('show.bs.modal', function(event) {
-                var button = $(event.relatedTarget)
-                var problem = button.data('problem')// E// Extract info from data-* attributes
-                // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
-                // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
-                var modal = $(this)
-                // modal.find('.modal-title').text(recipient)
-                modal.find('#problem_ticket').text(problem) // Extract info from data-* attributes
-            });
-
-        $(document).ready(function() {
-            $('.filter').attr('data-bs-toggle', 'modal');
-            $('.filter').attr('data-bs-target', '#exampleModal');
+    // =================================================================
+    // 2. Hubungkan Form Filter ke DataTable
+    // =================================================================
+    $('#exampleModal form').on('submit', function(e) {
+        e.preventDefault(); // Mencegah halaman reload
+        table.ajax.reload(); // Memuat ulang data tabel dengan parameter filter baru
+        $('#exampleModal').modal('hide'); // Tutup modal
+    });
 
 
-            $('#close').on('show.bs.modal', function(event) {
-                var button = $(event.relatedTarget) // Button that triggered the modal
-                var id = button.data('id') // Extract info from data-* attributes
-                // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
-                // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
-                var modal = $(this)
-                // modal.find('.modal-title').text(recipient)
-                modal.find('#id_ticket').val(id)
-            });
+    // =================================================================
+    // 3. Kode Event Handler untuk Modal & Sidebar yang Dirapikan
+    // =================================================================
+    $('#Detail').on('show.bs.modal', function(event) {
+        var button = $(event.relatedTarget);
+        var problem = button.data('problem');
+        $(this).find('#problem_ticket').text(problem);
+    });
 
-            $('#rating').on('show.bs.modal', function(event) {
-                var button = $(event.relatedTarget) // Button that triggered the modal
-                var id = button.data('id') // Extract info from data-* attributes
-                // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
-                // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
-                var modal = $(this)
-                // modal.find('.modal-title').text(recipient)
-                modal.find('#id_ticket').val(id)
-            });
+    $('#close, #rating').on('show.bs.modal', function(event) {
+        var button = $(event.relatedTarget);
+        var id = button.data('id');
+        $(this).find('#id_ticket').val(id);
+    });
 
-            $('#complain').on('show.bs.modal', function(event) {
-                var button = $(event.relatedTarget)
-                var id = button.data('id') // Extract info from data-* attributes
-                var code = button.data('code') // Extract info from data-* attributes
-                var katagori = button.data('katagori') // Extract info from data-* attributes
-                var status = button.data('status') // Extract info from data-* attributes
-                var agent = button.data('agent') // E// Extract info from data-* attributes
-                // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
-                // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
-                var modal = $(this)
-                // modal.find('.modal-title').text(recipient)
-                modal.find('#id_ticket').val(id) // Extract info from data-* attributes
-                modal.find('#code_ticket').val(code) // Extract info from data-* attributes
-                modal.find('#katagori_ticket').val(katagori) // Extract info from data-* attributes
-                modal.find('#status_ticket').val(status) // Extract info from data-* attributes
-                modal.find('#agent_ticket').val(agent) // Extract info from data-* attributes
-            });
+    $('#complain').on('show.bs.modal', function(event) {
+        var button = $(event.relatedTarget);
+        var modal = $(this);
+        // Ambil data dari tombol dan isi ke dalam form di modal
+        modal.find('#id_ticket').val(button.data('id'));
+        modal.find('#code_ticket').val(button.data('code'));
+        modal.find('#katagori_ticket').val(button.data('katagori'));
+        modal.find('#status_ticket').val(button.data('status'));
+        modal.find('#agent_ticket').val(button.data('agent'));
+    });
 
+    // Inisialisasi Datepicker
+    $("#start_date, #end_date").datepicker({
+        dateFormat: 'yy-mm-dd',
+        beforeShow: function() {
+            setTimeout(function() {
+                $('.ui-datepicker').css('z-index', 99999999999999);
+            }, 0);
+        }
+    });
+
+    // Logika Sidebar
+    $('#close_sidebar_data').click(function() {
+        $('#sidebar_data').hide();
+        $('#table_data').removeClass('col-9').addClass('col-12');
+    });
+
+    // 4. Event listener untuk row click yang di-delegasikan (agar berfungsi di semua halaman)
+    $('.tableku tbody').on('click', 'tr', function (event) {
+        // Jangan aktifkan sidebar jika yang diklik adalah tombol atau link di dalam sel
+        if ($(event.target).is('button, a, i')) {
+            return;
+        }
+
+        $('#sidebar_data').show();
+        $('#table_data').removeClass('col-12').addClass('col-9');
+        
+        var header = [];
+        var content = "<table class='table table-sm'>"; // Beri class agar lebih rapi
+        var cells = $(this).find('td');
+
+        $('.tableku thead th').each(function() {
+            header.push($(this).text().trim());
+        });
+        
+        cells.each(function(index) {
+            // Jangan tampilkan kolom 'Action' di sidebar
+            if (header[index] && header[index].toLowerCase() !== 'action') {
+                content += `<tr><td class="fw-bold">${header[index]}</td><td>&nbsp;:&nbsp;</td><td>${$(this).html()}</td></tr>`;
+            }
         });
 
-        $(function() {
-            $("#start_date").datepicker({
-                dateFormat: 'yy-mm-dd',
-                beforeShow: function() {
-                    setTimeout(function() {
-                        $('.ui-datepicker').css('z-index', 99999999999999);
-                    }, 0);
-                }
-            });
-            $("#end_date").datepicker({
-                dateFormat: 'yy-mm-dd',
-                beforeShow: function() {
-                    setTimeout(function() {
-                        $('.ui-datepicker').css('z-index', 99999999999999);
-                    }, 0);
-                }
-            }).bind("change", function() {
-                var minValue = $(this).val();
-                minValue = $.datepicker.parseDate("yy-mm-dd", minValue);
-                minValue.setDate(minValue.getDate() + 1);
-                $("#to").datepicker("option", "minDate", minValue);
-            })
-        });
-        $('#close_sidebar_data').click(function (e) {
-            $('#sidebar_data').hide();
-                $('#table_data').removeClass('col-9');
-                $('#table_data').addClass('col-12');
-        });
-        $(document).ready(function() {
-
-            // Reference to the sidebar
-            var sidebar = $('#sidebar_data');
-
-            // Add a click event listener to all table rows
-            $('.tableku tr').click(function() {
-                // Hide the sidebar initially
-                $('#table_data').removeClass('col-12');
-                $('#table_data').addClass('col-9');
-                var header = [];
-                // Get all the th elements (headers) within the first row
-                var headers = $('.tableku tr:first-child th');
-
-                // Get all the td elements (cell content) within the clicked row
-                var cells = $(this).find('td');
-
-                // Create a string to store header and cell content
-                var content = "";
-
-                // Loop through the headers and append their values to the content string
-                headers.each(function(index) {
-                    header.push($(this).text());
-                });
-                content += "<table>"
-                // Loop through the td elements and append their values to the content string
-                cells.each(function(index) {
-                    content += '<tr><td>'+header[index]+'</td>';
-                    content += '<td>&nbsp&nbsp:&nbsp&nbsp</td>';
-                    content += '<td>'+ $(this).text()+'</td></tr>';
-                });
-
-                content += "</table>"
-                // Update the content of the sidebar with cell content
-                $('#sidebar_data_body').html(content);
-
-                // Show the sidebar after updating its content
-                sidebar.show();
-            });
-        });
-    </script>
+        content += "</table>";
+        $('#sidebar_data_body').html(content);
+    });
+});
+</script>
 @endpush
