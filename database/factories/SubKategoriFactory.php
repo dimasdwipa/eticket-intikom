@@ -13,7 +13,7 @@ class SubKategoriFactory extends Factory
     public function definition()
     {
         return [
-            'sub_katagori' => $this->faker->sentence(3), // Contoh: "Permintaan instalasi software baru"
+            'sub_kategori' => $this->faker->sentence(3), // Contoh: "Permintaan instalasi software baru"
             // 'kategori_id' akan kita isi di seeder
         ];
     }

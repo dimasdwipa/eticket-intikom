@@ -16,7 +16,7 @@ class CreateSubKategorisTable extends Migration
         Schema::create('sub_kategoris', function (Blueprint $table) {
             $table->id();
             $table->foreignId('katagori_id');
-            $table->string('sub_katagori');
+            $table->string('sub_kategori');
             $table->timestamps();
         });
     }
