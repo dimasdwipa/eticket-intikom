@@ -358,34 +358,70 @@ class TicketController extends Controller
 
     public function getSummaryReportApi(Request $request)
     {
-        // 2. Ambil parameter 'length' & 'start' yang dikirim oleh DataTables
+        // Ambil parameter 'length' & 'start' yang dikirim oleh DataTables
         $length = $request->input('length', 15);
         $start = $request->input('start', 0);
         $page = ($start / $length) + 1;
 
-        // 3. Beritahu Laravel secara manual halaman mana yang sedang diminta
+        // Beritahu Laravel secara manual halaman mana yang sedang diminta
         Paginator::currentPageResolver(function () use ($page) {
             return $page;
         });
-        
-        $startDate = $request->input('start_date', date('Y-01-01'));
-        $endDate = $request->input('end_date', date('Y-m-d'));
 
-        // Query-nya tetap sama, tapi sekarang paginate() akan menggunakan halaman yang benar
-        $paginatedTickets = Ticket::with(['agent:id,name', 'user:id,name', 'lokasi', 'katagori', 'sub_katagori', 'team'])
+        // Query builder utama
+        $query = Ticket::with(['agent:id,name', 'user:id,name', 'lokasi', 'katagori', 'sub_katagori', 'team'])
             ->where('user_id', Auth::id())
-            ->allTeams()
-            ->when($request->filled('team_id'), function ($query) use ($request) {
-                $query->where('team_id', $request->team_id);
-            })
-            ->when($request->filled('filter_by') && $request->filled('keyword'), function ($query) use ($request) {
-                $query->where($request->filter_by, 'like', '%' . $request->keyword . '%');
-            })
-            ->whereBetween('tickets.created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59'])
-            ->orderby('tickets.created_at', 'desc')
-            ->paginate($length); // 4. Gunakan variabel $length di sini
+            ->allTeams();
 
-        // Format JSON sudah benar dan tidak perlu diubah
+        // =================================================================
+        // VVV INI BAGIAN YANG DIPERBAIKI VVV
+        // =================================================================
+
+        // Filter berdasarkan Tim (jika diisi)
+        $query->when($request->filled('team_id'), function ($q) use ($request) {
+            $q->where('team_id', $request->team_id);
+        });
+
+        // Filter berdasarkan Tanggal (HANYA jika kedua tanggal diisi)
+        $query->when($request->filled('start_date') && $request->filled('end_date'), function ($q) use ($request) {
+            $startDate = $request->input('start_date');
+            $endDate = $request->input('end_date');
+            $q->whereBetween('tickets.created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59']);
+        });
+
+        // Filter berdasarkan Keyword (jika diisi)
+        $query->when($request->filled('filter_by') && $request->filled('keyword'), function ($q) use ($request) {
+            // Cek jika filter_by adalah 'name', kita perlu filter relasi
+            if ($request->filter_by == 'name') {
+                $q->whereHas('agent', function($subQuery) use ($request) {
+                    $subQuery->where('name', 'like', '%' . $request->keyword . '%');
+                });
+            } else {
+                $q->where($request->filter_by, 'like', '%' . $request->keyword . '%');
+            }
+        });
+
+        // Filter berdasarkan Searchbox utama DataTables (jika diisi)
+        if ($request->filled('search.value')) {
+            $searchValue = $request->input('search.value');
+            $query->where(function($q) use ($searchValue) {
+                $q->where('code', 'like', "%{$searchValue}%")
+                ->orWhere('problem', 'like', "%{$searchValue}%")
+                ->orWhere('status', 'like', "%{$searchValue}%")
+                ->orWhereHas('agent', function($subQuery) use ($searchValue) {
+                    $subQuery->where('name', 'like', "%{$searchValue}%");
+                });
+            });
+        }
+
+        // =================================================================
+        // ^^^ AKHIR DARI PERBAIKAN ^^^
+        // =================================================================
+
+        // Lanjutkan query dengan ordering dan paginasi
+        $paginatedTickets = $query->orderby('tickets.created_at', 'desc')->paginate($length);
+
+        // Format JSON agar sesuai dengan DataTables
         return response()->json([
             "draw" => intval($request->input('draw')),
             "recordsTotal" => $paginatedTickets->total(),
