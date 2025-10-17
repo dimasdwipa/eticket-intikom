@@ -234,6 +234,11 @@
                         </div>
                     </div>
                     <div class="modal-footer py-2 bg-gray-200">
+                        {{-- VVV TAMBAHKAN TOMBOL INI VVV --}}
+                        <button type="button" id="clearFilterBtn" class="btn btn-outline-secondary btn-sm m-3">
+                            CLEAR
+                        </button>
+                        {{-- ^^^ AKHIR TAMBAHAN ^^^ --}}
                         <button type="submit" class="btn btn-outline-success btn-sm m-0">
                             FIND
                         </button>
@@ -571,6 +576,19 @@ $(document).ready(function() {
         $('#exampleModal').modal('hide'); // Tutup modal
     });
 
+    $('#clearFilterBtn').on('click', function() {
+        // Cari form di dalam modal
+        var form = $('#exampleModal form');
+        
+        // Reset semua input di dalam form
+        form[0].reset();
+        
+        // Muat ulang data tabel
+        table.ajax.reload();
+        
+        // Tutup modal
+        $('#exampleModal').modal('hide');
+    });
 
     // =================================================================
     // 3. Kode Event Handler untuk Modal & Sidebar yang Dirapikan
