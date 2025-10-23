@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\File;
-use Illuminate\Pagination\Paginator; // <-- 1. TAMBAHKAN INI DI ATAS
+use Illuminate\Pagination\Paginator;
 
 
 class TicketController extends Controller

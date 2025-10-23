@@ -12,6 +12,7 @@ use App\Models\SubKategori;
 use App\Models\Complain;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use Illuminate\Pagination\Paginator;
 
 
 class AgentController extends Controller
@@ -45,10 +46,6 @@ class AgentController extends Controller
 
     public function index()
     {
-
-
-
-
         $tickets_icon=Ticket::whereBetween('created_at',[Carbon::now()->startOfYear(), Carbon::now()])
         ->where('user_id',Auth::id())
         // ->when(!empty($_GET['status']),function($query){
@@ -88,41 +85,67 @@ class AgentController extends Controller
 
     public function assignment()
     {
-
-        $hari_ini = date("Y-m-d");
-        $tgl_pertama =  date('Y-01-01', strtotime($hari_ini));
-        $tgl_terakhir = date('Y-m-t', strtotime($hari_ini));
-
-        if(!empty($_GET['start_date'])){
-            $tgl_pertama=$_GET['start_date'];
-        }
-
-        if(!empty($_GET['end_date'])){
-
-            $tgl_terakhir= $_GET['end_date'];
-        }
-
-        $tickets=Ticket::select('tickets.*','users.name')
-            ->leftjoin('users','tickets.agent_id','=','users.id')
-            ->when(!empty($_GET['filter_by']),function($query){
-                return $query->where($_GET['filter_by'], 'like',  '%'.$_GET['keyword'].'%');
-             })
-            ->whereBetween('tickets.created_at', [$tgl_pertama.' 00:00:00', $tgl_terakhir.' 23:59:59'])
-            ->where('tickets.agent_id',Auth::id())
-            ->where('tickets.status','!=','Open')
-            ->where('tickets.status','!=','Canceled')
-            ->orderby('tickets.created_at','desc')->get();
-
-
-
-
-
         return view('agent.myticket')
-        ->with('lokasi',Lokasi::orderby('created_at','desc')->get())
-        ->with('kategori',Kategori::orderby('created_at','desc')->get())
-        ->with('subkategori',SubKategori::orderby('created_at','desc')->get())
-        ->with('tickets',$tickets);
+            ->with('lokasi', Lokasi::orderby('created_at', 'desc')->get())
+            ->with('kategori', Kategori::orderby('created_at', 'desc')->get())
+            ->with('subkategori', SubKategori::orderby('created_at', 'desc')->get());
+    }
 
+    public function getMyTicketsApi(Request $request)
+    {
+        // Ambil parameter pagination dari DataTables
+        $length = $request->input('length', 15);
+        $start = $request->input('start', 0);
+        $page = ($start / $length) + 1;
+
+        // Beritahu Laravel halaman mana yang sedang diminta
+        Paginator::currentPageResolver(function () use ($page) {
+            return $page;
+        });
+        
+        // Ambil parameter filter dari request AJAX
+        $startDate = $request->input('start_date', date('Y-01-01'));
+        $endDate = $request->input('end_date', date('Y-m-d'));
+
+        // Query builder utama yang sudah dioptimalkan
+        $query = Ticket::with(['user:id,name', 'lokasi', 'katagori', 'sub_katagori'])
+            ->where('tickets.agent_id', Auth::id())
+            ->where('tickets.status', '!=', 'Open')
+            ->where('tickets.status', '!=', 'Canceled');
+
+        // Terapkan filter kustom jika ada
+        $query->when($request->filled('filter_by') && $request->filled('keyword'), function ($q) use ($request) {
+            $q->where($request->filter_by, 'like', '%' . $request->keyword . '%');
+        });
+        
+        // Terapkan filter tanggal jika ada
+        $query->when($request->filled('start_date') && $request->filled('end_date'), function ($q) use ($startDate, $endDate) {
+            $q->whereBetween('tickets.created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59']);
+        });
+
+        // Terapkan filter dari searchbox utama DataTables
+        if ($request->filled('search.value')) {
+            $searchValue = $request->input('search.value');
+            $query->where(function($q) use ($searchValue) {
+                $q->where('code', 'like', "%{$searchValue}%")
+                  ->orWhere('problem', 'like', "%{$searchValue}%")
+                  ->orWhere('status', 'like', "%{$searchValue}%")
+                  ->orWhereHas('user', function($subQuery) use ($searchValue) {
+                      $subQuery->where('name', 'like', "%{$searchValue}%");
+                  });
+            });
+        }
+
+        // Eksekusi query dengan ordering dan paginasi
+        $paginatedTickets = $query->orderby('tickets.created_at', 'desc')->paginate($length);
+
+        // Format JSON agar sesuai dengan DataTables
+        return response()->json([
+            "draw" => intval($request->input('draw')),
+            "recordsTotal" => $paginatedTickets->total(),
+            "recordsFiltered" => $paginatedTickets->total(),
+            "data" => $paginatedTickets->items()
+        ]);
     }
 
     public function response(Request $request){
@@ -203,6 +226,10 @@ class AgentController extends Controller
             return back()->with('error',$th);
         }
 
+        if ($request->ajax()) {
+        return response()->json(['success' => 'Ticket #' . $data->code . ' has been responded to.']);
+        }
+        return back()->with('success', 'Ticket #' . $data->code . ' have been responded to with you, Enjoy your work !');
 
 
         if($request->status=="On Progress"){

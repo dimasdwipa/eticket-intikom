@@ -80,6 +80,7 @@ Route::middleware(['auth'])->group(function (){
 
     Route::resource('agent', App\Http\Controllers\AgentController::class);
     Route::get('/my-ticket', [App\Http\Controllers\AgentController::class,'assignment'])->name('agent.myticket');
+    Route::get('/api/my-tickets', [App\Http\Controllers\AgentController::class, 'getMyTicketsApi'])->name('api.agent.mytickets');
     Route::post('/agent-response', [App\Http\Controllers\AgentController::class,'response'])->name('agent.response');
     Route::post('/agent-request', [App\Http\Controllers\AgentController::class,'request'])->name('agent.request');
 
