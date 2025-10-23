@@ -12,7 +12,7 @@ class TicketFactory extends Factory
 
     public function definition()
     {
-        $statusOptions = ['open', 'pending', 'on progress', 'closed', 'complain'];
+        $statusOptions = ['Awaiting Response', 'On Progress', 'Repairing', 'Pending', 'Resolved'];
         $priorityOptions = ['low', 'medium', 'high', 'critical', 'normal']; // Sesuaikan dengan database
 
         return [

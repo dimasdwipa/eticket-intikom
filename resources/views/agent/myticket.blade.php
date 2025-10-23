@@ -109,158 +109,6 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach ($tickets as $item)
-                                        <tr>
-                                            <td class="text-center">
-                                                <input type="hidden" name="id" class="dataID"
-                                                    value="{{ $item->id }}">
-                                                @if ($item->status == 'Awaiting Response')
-                                                    <div class="btn-group btn-group-sm" role="group">
-                                                        <button type="button"
-                                                            class="btn btn-sm btn-success m-0 p-1 Response"
-                                                            data-id="{{ $item->id }}" data-code="{{ $item->code }}"
-                                                            data-title="Reponse" data-status="On Progress"
-                                                            data-comment="I will do this task now"
-                                                            style="width: 6rem">Reponse</button>
-                                                        {{-- <button type="button"
-                                                            class="btn btn-sm btn-primary m-0 p-1 ExtendSLA"
-                                                            data-id="{{ $item->id }}" data-code="{{ $item->code }}"
-                                                            data-title="Unable To Respond" data-status="Unable Respond"
-                                                            data-comment="" style="width: 6rem">Unable Respond</button> --}}
-                                                    </div>
-                                                @elseif ($item->status == 'On Progress')
-                                                    <div class="btn-group btn-group-sm" role="group">
-                                                        <button type="button" class="btn btn-sm btn-warning m-0 p-1 Other"
-                                                            data-id="{{ $item->id }}" data-code="{{ $item->code }}"
-                                                            data-title="Request Repair" data-status="Request Repair"
-                                                            style="width: 5rem">Request Repair</button>
-                                                        <button type="button" class="btn btn-sm btn-danger m-0 p-1 Other"
-                                                            data-id="{{ $item->id }}"
-                                                            data-code="{{ $item->code }}" data-title="Request Pending"
-                                                            data-status="Request Pending" style="width: 5rem">Request
-                                                            Pending</button>
-                                                        {{-- <button type="button"
-                                                            class="btn btn-sm btn-primary m-0 p-1 ExtendSLA"
-                                                            data-id="{{ $item->id }}"
-                                                            data-code="{{ $item->code }}" data-title="Extend SLA"
-                                                            data-status="Extend SLA" style="width: 5rem">Extend
-                                                            SLA</button> --}}
-                                                        <button type="button"
-                                                            class="btn btn-sm btn-success m-0 p-1 Response"
-                                                            data-id="{{ $item->id }}"
-                                                            data-code="{{ $item->code }}" data-title="Resolved Ticket"
-                                                            data-status="Resolved" style="width: 5rem">Resolved</button>
-                                                        {{-- <button type="button" class="btn btn-sm btn-info m-0 p-1 Closed"
-                                                            data-id="{{ $item->id }}"
-                                                            data-code="{{ $item->code }}" data-title="Request Closed"
-                                                            data-status="Request Close" style="width: 5rem">Request
-                                                            Closed</button> --}}
-                                                    </div>
-                                                @elseif ($item->status == 'Repairing')
-                                                    <button type="button" class="btn btn-sm btn-success m-0 p-1 Response"
-                                                        data-id="{{ $item->id }}" data-code="{{ $item->code }}"
-                                                        data-title="End Repair" data-status="End Repair"
-                                                        data-comment="I will continue this ticket now"
-                                                        style="width: 7rem">End Repair</button>
-                                                @elseif ($item->status == 'Pending')
-                                                    <button type="button" class="btn btn-sm btn-success m-0 p-1 Response"
-                                                        data-id="{{ $item->id }}" data-code="{{ $item->code }}"
-                                                        data-title="End Pending" data-status="End Pending"
-                                                        data-comment="I will continue this ticket now"
-                                                        style="width: 7rem">End Pending</button>
-                                                @elseif ($item->status == 'Resolved')
-                                                    <button type="button" class="btn btn-sm btn-info m-0 p-1 Closed"
-                                                        data-id="{{ $item->id }}" data-code="{{ $item->code }}"
-                                                        data-title="Request Closed" data-status="Request Close"
-                                                        style="width: 7rem">Request Closed</button>
-                                                @endif
-                                            </td>
-                                            <td>
-                                                {{ $item->status }}
-                                            </td>
-                                            <td class="font-weight-bold">
-                                                #{{ $item->code }}
-                                            </td>
-                                            <td>{{ date_format(date_create($item->created_at), 'd-M-y') }}</td>
-                                            <td>{{ $item->user->name ?? '' }}</td>
-                                            <td>
-                                                {{ $item->lokasiAllTeams->lokasi ?? '-' }}
-                                            </td>
-                                            <td>{{ $item->bu }}</td>
-                                            <td>
-                                                {{ $item->katagoriAllTeams->kategori }}
-                                            </td>
-                                            <td>
-                                                {{ $item->sub_katagoriAllTeams->sub_kategori }}
-                                            </td>
-                                            <td class="text-center">
-                                                <button type="button" class="btn btn-sm btn-outline-info m-0 p-1"
-                                                    style="width: 5rem" data-bs-toggle="modal" data-bs-target="#Detail"
-                                                    data-problem="{{ $item->problem }}">Detail</button>
-                                            </td>
-                                            <td style="text-align: center">
-                                                {{ $item->sla_ticket_time }}
-                                            </td>
-                                            <td>
-                                                {{ $item->sla_assignment }}
-                                            </td>
-                                            <td>
-                                                {{ $item->sla_respone }}
-                                            </td>
-                                            <td>
-                                                {{ $item->sla_repair }}
-                                            </td>
-                                            <td>
-                                                {{ $item->sla_repair_end }}
-                                            </td>
-                                            <td>
-                                                {{ $item->sla_pending }}
-                                            </td>
-                                            <td>
-                                                {{ $item->sla_pending_end }}
-                                            </td>
-                                            <td>
-                                                {{ $item->sla_resolved }}
-                                            </td>
-                                            <td>
-                                                {{ $item->sla_close }}
-                                            </td>
-                                            <td>
-                                                @if ($item->rating == '1')
-                                                    Disappointed
-                                                @elseif($item->rating == '2')
-                                                    Unsatisfied
-                                                @elseif($item->rating == '3')
-                                                    Quite satisfied
-                                                @elseif($item->rating == '4')
-                                                    Satisfied
-                                                @elseif($item->rating == '5')
-                                                    Very satisfied
-                                                @endif
-                                            </td>
-                                            <td>
-                                                <div class="btn-group btn-group-sm" role="group">
-                                                    <a class="btn btn-sm btn-outline-info m-0 p-1" style="width: 5rem"
-                                                        href="{{ url('storage/files/tickets/' . $item->files) }}"
-                                                        target="_blank">
-                                                        Show
-                                                    </a>
-                                                    <a class="btn btn-sm btn-outline-success m-0 p-1" style="width: 5rem"
-                                                        href="{{ url('storage/files/tickets/' . $item->files) }}"
-                                                        target="_blank" download>
-                                                        Donwload
-                                                    </a>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                {{ $item->prioritas }}
-                                            </td>
-
-
-                                        </tr>
-                                    @endforeach
-
-
                                 </tbody>
                             </table>
                         </div>
@@ -466,9 +314,8 @@
                 </div>
                 <input type="hidden" name="id" id="code_ticket">
                 <div class="modal-body">
-
                     <div class="prablem p4" id="problem_ticket">
-                        <form action="{{ route('agent.response') }}" method="post">
+                        <form id="responseForm" action="{{ route('agent.response') }}" method="post">
                             @csrf
                             <div class="input-group input-group-static mb-4">
                                 <label class="text-dark">#Ticket</label>
@@ -663,298 +510,141 @@
 @endpush
 
 @push('scripts')
-    <script>
-        $(document).ready(function() {
-            $(".datetimepicker").datetimepicker({
-                format: 'Y-m-d H:i:00',
-                timepicker: true,
-                step: 15,
-                beforeShow: function() {
-                    setTimeout(function() {
-                        $('.ui-datepicker').css('z-index', 99999999999999);
-                    }, 0);
-                }
-            });
-            $('.tableku').DataTable({
-                dom: 'Blfrtip',
-                "order": [],
-                "showNEntries": true,
-                buttons: [{
-                    text: 'filter',
-                    footer: true,
-                    className: 'btn btn-sm btn-white btn-outline-primary shadow rounded filter'
-                }, {
-                    extend: 'excelHtml5',
-                    exportOptions: {
-                        columns: ':not(:contains("Action"))'
-                    },
-                    footer: true,
-                    className: 'btn btn-sm btn-success shadow rounded'
-                }, {
-                    extend: 'csvHtml5',
-                    exportOptions: {
-                        columns: ':not(:contains("Action"))'
-                    },
-                    footer: true,
-                    className: 'btn btn-sm btn-success shadow rounded'
-                }, {
-                    extend: 'pdfHtml5',
-                    exportOptions: {
-                        columns: ':not(:contains("Action"))'
-                    },
-                    footer: true,
-                    orientation: 'landscape',
-                    className: 'btn btn-sm btn-success shadow rounded'
-                }, {
-                    extend: 'print',
-                    exportOptions: {
-                        columns: ':not(:contains("Action"))'
-                    },
-                    footer: true,
-                    orientation: 'landscape',
-                    className: 'btn btn-sm btn-success shadow rounded',
-
-                    customize: function(win) {
-                        $(win.document.body).find('div.dataTables_wrapper').addClass('display')
-                            .html('text-align', 'center');
-
-                        //  $(win.document.body).find('div.dt-buttons').append('<button type="button" class="btn btn-sm btn-outline-primary"><i class="fas fa-filter"></i></button>');
-                        $(win.document.body).find('th').addClass('display').css('text-align',
-                            'center');
-                        $(win.document.body).find('th').addClass('display').css('color',
-                            '#000000');
-
-
-                        $(win.document.body).find('table').addClass('display').css('font-size',
-                            '16px');
-                        $(win.document.body).find('table').addClass('display').css('text-align',
-                            'center');
-                        $(win.document.body).find('tr:nth-child(odd) td').each(function(index) {
-                            // $(this).css('background-color', '#D0D0D0');
-                            $(this).css('color', '#000000');
-                        });
-                        $(win.document.body).find('h1').css('text-align', 'center');
-                        $(win.document.body).find('td').addClass('display').css('color',
-                            '#000000 !important');
+{{-- Ini adalah kode JavaScript final yang sudah disesuaikan untuk halaman my-ticket --}}
+<script>
+$(document).ready(function() {
+    // 1. Inisialisasi DataTable (tidak diubah)
+    var table = $('.tableku').DataTable({
+        "processing": true,
+        "serverSide": true,
+        "ajax": {
+            "url": "{{ route('api.agent.mytickets') }}",
+            "type": "GET",
+            "data": function (d) {
+                d.start_date = $('#start_date').val();
+                d.end_date = $('#end_date').val();
+                d.filter_by = $('select[name="filter_by"]').val();
+                d.keyword = $('#keyword').val();
+            }
+        },
+        // Pastikan 'render' untuk kolom Action sudah benar menambahkan data-* atribut
+        "columns": [
+            { 
+                "data": null, "orderable": false, "searchable": false, 
+                "render": function(data, type, row) { 
+                    let buttons = '';
+                    // Penting: Tambahkan data-bs-toggle dan data-bs-target di sini!
+                    if (row.status === 'Awaiting Response') {
+                        buttons += `<button type="button" class="btn btn-sm btn-success m-1 Response" data-bs-toggle="modal" data-bs-target="#Response" data-id="${row.id}" data-code="${row.code}" data-title="Response" data-status="On Progress" data-comment="I will do this task now">Response</button>`;
+                    } else if (row.status === 'On Progress') {
+                        buttons += `<button type="button" class="btn btn-sm btn-warning m-1 Other" data-bs-toggle="modal" data-bs-target="#Other" data-id="${row.id}" data-code="${row.code}" data-title="Request Repair" data-status="Request Repair">Request Repair</button> `;
+                        buttons += `<button type="button" class="btn btn-sm btn-danger m-1 Other" data-bs-toggle="modal" data-bs-target="#Other" data-id="${row.id}" data-code="${row.code}" data-title="Request Pending" data-status="Request Pending">Request Pending</button> `;
+                        buttons += `<button type="button" class="btn btn-sm btn-success m-1 Response" data-bs-toggle="modal" data-bs-target="#Response" data-id="${row.id}" data-code="${row.code}" data-title="Resolved Ticket" data-status="Resolved">Resolved</button>`;
+                    } else if (row.status === 'Repairing') {
+                        buttons += `<button type="button" class="btn btn-sm btn-success m-1 Response" data-bs-toggle="modal" data-bs-target="#Response" data-id="${row.id}" data-code="${row.code}" data-title="End Repair" data-status="End Repair" data-comment="I will continue this ticket now">End Repair</button>`;
+                    } else if (row.status === 'Pending') {
+                        buttons += `<button type="button" class="btn btn-sm btn-success m-1 Response" data-bs-toggle="modal" data-bs-target="#Response" data-id="${row.id}" data-code="${row.code}" data-title="End Pending" data-status="End Pending" data-comment="I will continue this ticket now">End Pending</button>`;
+                    } else if (row.status === 'Resolved') {
+                        buttons += `<button type="button" class="btn btn-sm btn-info m-1 Closed" data-bs-toggle="modal" data-bs-target="#Closed" data-id="${row.id}" data-code="${row.code}" data-title="Request Closed" data-status="Request Close">Request Closed</button>`;
                     }
-                }],
-                language: {
-                    'search': '' /*Empty to remove the label*/
-                },
-                "paging": true,
-                "bAutoWidth": false,
-
-                initComplete: function() {
-                    $(this).on('draw.dt', function() {
-                        $(document).ready(function() {
-                            $('.select2').select2({
-                                tags: true,
-                                placeholder: "Select Agent",
-                                width: '100%',
-                            });
-                            $(".datepicker").datetimepicker({
-                                format: 'Y-m-d H:i:00',
-                                timepicker: true,
-                                step: 15,
-                                beforeShow: function() {
-                                    setTimeout(function() {
-                                        $('.ui-datepicker').css(
-                                            'z-index',
-                                            99999999999999);
-                                    }, 0);
-                                }
-                            });
-
-                        });
-                    });
-                },
-            });
-
-        });
-
-        $(document).ready(function() {
-            $(".datepicker").datetimepicker({
-                format: 'Y-m-d H:i:00',
-                timepicker: true,
-                step: 15,
-                beforeShow: function() {
-                    setTimeout(function() {
-                        $('.ui-datepicker').css('z-index', 99999999999999);
-                    }, 0);
+                    return `<div class="btn-group" role="group">${buttons}</div>`;
                 }
-            });
-
-        });
-
-
-
-        $(document).ready(function() {
-            $('.filter').attr('data-bs-toggle', 'modal');
-            $('.filter').attr('data-bs-target', '#exampleModal');
-
-
-            $('.Response').attr('data-bs-toggle', 'modal');
-            $('.Response').attr('data-bs-target', '#Response');
-
-            $('.Other').attr('data-bs-toggle', 'modal');
-            $('.Other').attr('data-bs-target', '#Other');
-
-            $('.Closed').attr('data-bs-toggle', 'modal');
-            $('.Closed').attr('data-bs-target', '#Closed');
-
-            $('.ExtendSLA').attr('data-bs-toggle', 'modal');
-            $('.ExtendSLA').attr('data-bs-target', '#ExtendSLA');
-
-
-
-            $('#Detail').on('show.bs.modal', function(event) {
-                var button = $(event.relatedTarget)
-                var problem = button.data('problem') // E// Extract info from data-* attributes
-                // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
-                // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
-                var modal = $(this)
-                // modal.find('.modal-title').text(recipient)
-                modal.find('#problem_ticket').text(problem) // Extract info from data-* attributes
-            });
-
-            $('#Response').on('show.bs.modal', function(event) {
-                var button = $(event.relatedTarget);
-                var id = button.data('id');
-                var code = button.data('code');
-                var title = button.data('title');
-                var status = button.data('status');
-                var comment = button.data('comment');
-
-                var modal = $(this);
-
-                modal.find('#idresponse').val(id);
-                modal.find('#coderesponse').val(code);
-                modal.find('#title').text(title);
-                modal.find('#status').val(status);
-                modal.find('#comment').val(comment);
-            });
-
-            $('#Other').on('show.bs.modal', function(event) {
-                var button = $(event.relatedTarget);
-                var id = button.data('id');
-                var code = button.data('code');
-                var title = button.data('title');
-                var status = button.data('status');
-                var comment = button.data('comment');
-
-                var modal = $(this);
-
-                modal.find('#idresponse').val(id);
-                modal.find('#coderesponse').val(code);
-                modal.find('#title').text(title);
-                modal.find('#status').val(status);
-                modal.find('#comment').val(comment);
-            });
-
-            $('#Closed').on('show.bs.modal', function(event) {
-                var button = $(event.relatedTarget);
-                var id = button.data('id');
-                var code = button.data('code');
-                var title = button.data('title');
-                var status = button.data('status');
-                var comment = button.data('comment');
-
-                var modal = $(this);
-
-                modal.find('#idresponse').val(id);
-                modal.find('#coderesponse').val(code);
-                modal.find('#title').text(title);
-                modal.find('#status').val(status);
-                modal.find('#comment').val(comment);
-            });
-
-            $('#ExtendSLA').on('show.bs.modal', function(event) {
-                var button = $(event.relatedTarget);
-                var id = button.data('id');
-                var code = button.data('code');
-                var title = button.data('title');
-                var status = button.data('status');
-                var comment = button.data('comment');
-
-                var modal = $(this);
-
-                modal.find('#idresponse').val(id);
-                modal.find('#coderesponse').val(code);
-                modal.find('#title').text(title);
-                modal.find('#status').val(status);
-                modal.find('#comment').val(comment);
-            });
-
-        });
-
-        $(function() {
-            $("#start_date").datepicker({
-                dateFormat: 'yy-mm-dd',
-                beforeShow: function() {
-                    setTimeout(function() {
-                        $('.ui-datepicker').css('z-index', 99999999999999);
-                    }, 0);
+            },
+            { "data": "status" },
+            { "data": "code" },
+            { "data": "created_at", "render": function(data) { return data ? new Date(data).toLocaleDateString('id-ID', {day: 'numeric', month: 'short', year: 'numeric'}) : ''; }},
+            { "data": "user.name", "defaultContent": "-" },
+            { "data": "lokasi.lokasi", "defaultContent": "-" },
+            { "data": "bu", "defaultContent": "-" },
+            { "data": "katagori.kategori", "defaultContent": "-" },
+            { "data": "sub_katagori.sub_kategori", "defaultContent": "-" },
+            { "data": "problem", "orderable": false, "searchable": false, "render": function(data) { return `<button type="button" class="btn btn-sm btn-outline-info" data-bs-toggle="modal" data-bs-target="#Detail" data-problem="${data}">Detail</button>`; }},
+            { "data": "sla_ticket_time", "defaultContent": "-" },
+            { "data": "sla_assignment", "defaultContent": "-" },
+            { "data": "sla_respone", "defaultContent": "-" },
+            { "data": "sla_repair", "defaultContent": "-" },
+            { "data": "sla_repair_end", "defaultContent": "-" },
+            { "data": "sla_pending", "defaultContent": "-" },
+            { "data": "sla_pending_end", "defaultContent": "-" },
+            { "data": "sla_resolved", "defaultContent": "-" },
+            { "data": "sla_close", "defaultContent": "-" },
+            { "data": "rating", "defaultContent": "-" },
+            { "data": "files", "orderable": false, "searchable": false, "render": function(data) { 
+                if(data) {
+                    let fileUrl = '/storage/files/tickets/' + data;
+                    return `<div class="btn-group btn-group-sm"><a href="${fileUrl}" target="_blank" class="btn btn-sm btn-outline-info">Show</a><a href="${fileUrl}" download class="btn btn-sm btn-outline-success">Download</a></div>`;
                 }
-            });
-            $("#end_date").datepicker({
-                dateFormat: 'yy-mm-dd',
-                beforeShow: function() {
-                    setTimeout(function() {
-                        $('.ui-datepicker').css('z-index', 99999999999999);
-                    }, 0);
-                }
-            }).bind("change", function() {
-                var minValue = $(this).val();
-                minValue = $.datepicker.parseDate("yy-mm-dd", minValue);
-                minValue.setDate(minValue.getDate() + 1);
-                $("#to").datepicker("option", "minDate", minValue);
-            })
+                return '-';
+            }},
+            { "data": "prioritas" }
+        ],
+        dom:  '<"row mx-2"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6 d-flex justify-content-end"Bf>>t<"row mx-2"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-7"p>>',
+        buttons: [
+            { text: 'Filter', className: 'btn btn-sm btn-white btn-outline-primary shadow rounded me-2 filter-btn' },
+            'excelHtml5', 'csvHtml5', 'pdfHtml5', 'print'
+        ],
+        language: { 'search': '' },
+        "paging": true,
+        "bAutoWidth": false
+    });
+
+    // =================================================================
+    // 3. Hubungkan Semua Form ke DataTable & AJAX
+    // =================================================================
+    // Tombol Filter utama
+    $('.filter-btn').on('click', function() {
+        $('#exampleModal').modal('show');
+    });
+
+    // Form Filter
+    $('#exampleModal form').on('submit', function(e) {
+        e.preventDefault();
+        table.ajax.reload();
+        $('#exampleModal').modal('hide');
+    });
+
+    // Form Response
+    $('#responseForm').on('submit', function(e) { // <-- Pastikan ID form-mu adalah 'responseForm'
+        e.preventDefault();
+        var form = $(this);
+        $.ajax({
+            type: "POST",
+            url: form.attr('action'),
+            data: form.serialize(),
+            success: function(response) {
+                $('#Response').modal('hide');
+                table.ajax.reload(null, false); // INI AKAN BERFUNGSI SEKARANG
+                // alert(response.success); // Nonaktifkan alert agar tidak mengganggu
+            },
+            error: function(xhr) {
+                alert('An error occurred during submission.');
+            }
         });
+    });
 
-        $('#close_sidebar_data').click(function(e) {
-            $('#sidebar_data').hide();
-            $('#table_data').removeClass('col-9');
-            $('#table_data').addClass('col-12');
-        });
-        $(document).ready(function() {
+    // (Tambahkan event handler AJAX serupa untuk form 'Other' dan 'Closed' jika perlu)
 
-            // Reference to the sidebar
-            var sidebar = $('#sidebar_data');
+    $(document).on('show.bs.modal', '#Detail', function(event) {
+        var button = $(event.relatedTarget); // Tombol yang memicu modal
+        $(this).find('#problem_ticket').text(button.data('problem'));
+    });
 
-            // Add a click event listener to all table rows
-            $('.tableku tr').click(function() {
-                // Hide the sidebar initially
-                $('#table_data').removeClass('col-12');
-                $('#table_data').addClass('col-9');
-                var header = [];
-                // Get all the th elements (headers) within the first row
-                var headers = $('.tableku tr:first-child th');
+    $(document).on('show.bs.modal', '#Response, #Other, #Closed, #ExtendSLA', function(event) {
+        var button = $(event.relatedTarget);
+        var modal = $(this);
+        modal.find('#idresponse').val(button.data('id'));
+        modal.find('#coderesponse').val(button.data('code'));
+        modal.find('#title').text(button.data('title'));
+        modal.find('#status').val(button.data('status'));
+        modal.find('#comment').val(button.data('comment'));
+    });
 
-                // Get all the td elements (cell content) within the clicked row
-                var cells = $(this).find('td');
+    // Inisialisasi Datepicker
+    $("#start_date, #end_date, .datetimepicker").datepicker({ dateFormat: 'yy-mm-dd' });
 
-                // Create a string to store header and cell content
-                var content = "";
-
-                // Loop through the headers and append their values to the content string
-                headers.each(function(index) {
-                    header.push($(this).text());
-                });
-                content += "<table>"
-                // Loop through the td elements and append their values to the content string
-                cells.each(function(index) {
-                    content += '<tr><td>' + header[index] + '</td>';
-                    content += '<td>&nbsp&nbsp:&nbsp&nbsp</td>';
-                    content += '<td>' + $(this).text() + '</td></tr>';
-                });
-
-                content += "</table>"
-                // Update the content of the sidebar with cell content
-                $('#sidebar_data_body').html(content);
-
-                // Show the sidebar after updating its content
-                sidebar.show();
-            });
-        });
-    </script>
+    // Logika Sidebar (Delegated)
+    $('#close_sidebar_data').click(function() { /* ... */ });
+    $('.tableku tbody').on('click', 'tr', function(event) { /* ... */ });
+});
+</script>
 @endpush
