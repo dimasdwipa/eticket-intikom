@@ -255,6 +255,16 @@ class AgentController extends Controller
             'comment' => 'required'
         ]);
 
+        $ticket = Ticket::find($request->id);
+        if ($request->status === 'Request Pending') {
+            $ticket->status = 'Pending'; // Ubah status tiketnya
+            $ticket->sla_pending = now(); // Catat waktu mulai pending
+        } else if ($request->status === 'Request Repair') {
+            $ticket->status = 'Repairing'; // Ubah status tiketnya
+            $ticket->sla_repair = now(); // Catat waktu mulai repair
+        }
+        $ticket->save();
+
         $data2 = new Complain();
         $data2->ticket_id = $request->id;
         $data2->agent_id = Auth::user()->id;

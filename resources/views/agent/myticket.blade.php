@@ -361,7 +361,7 @@
                 <input type="hidden" name="id" id="code_ticket">
                 <div class="modal-body">
                     <div class="prablem p4" id="problem_ticket">
-                        <form action="{{ route('agent.request') }}" method="post">
+                        <form id="otherForm" action="{{ route('agent.request') }}" method="post">
                             @csrf
                             <div class="input-group input-group-static mb-4">
                                 <label class="text-dark">#Ticket</label>
@@ -622,25 +622,56 @@ $(document).ready(function() {
         });
     });
 
+    $('form#otherForm').on('submit', function(e) {
+        e.preventDefault();
+        submitFormViaAjax($(this), table);
+    });
+
     // (Tambahkan event handler AJAX serupa untuk form 'Other' dan 'Closed' jika perlu)
 
     $(document).on('show.bs.modal', '#Detail', function(event) {
-        var button = $(event.relatedTarget); // Tombol yang memicu modal
+        var button = $(event.relatedTarget);
         $(this).find('#problem_ticket').text(button.data('problem'));
     });
 
-    $(document).on('show.bs.modal', '#Response, #Other, #Closed, #ExtendSLA', function(event) {
+    $(document).on('show.bs.modal', '#Response, #Closed, #ExtendSLA', function(event) {
         var button = $(event.relatedTarget);
         var modal = $(this);
-        modal.find('#idresponse').val(button.data('id'));
-        modal.find('#coderesponse').val(button.data('code'));
+        modal.find('input[name="id"]').val(button.data('id'));
+        modal.find('input[name="code"]').val(button.data('code'));
         modal.find('#title').text(button.data('title'));
-        modal.find('#status').val(button.data('status'));
-        modal.find('#comment').val(button.data('comment'));
+        modal.find('input[name="status"]').val(button.data('status'));
+        modal.find('textarea[name="comment"]').val(button.data('comment'));
     });
 
-    // Inisialisasi Datepicker
-    $("#start_date, #end_date, .datetimepicker").datepicker({ dateFormat: 'yy-mm-dd' });
+    // --- Handler Khusus untuk Modal "Request Pending" (`#Other`) ---
+    $(document).on('show.bs.modal', '#Other', function(event) {
+        var button = $(event.relatedTarget);
+        var modal = $(this);
+
+        // Isi data modal seperti biasa
+        modal.find('input[name="id"]').val(button.data('id'));
+        modal.find('input[name="code"]').val(button.data('code'));
+        modal.find('#title').text(button.data('title'));
+        modal.find('input[name="status"]').val(button.data('status'));
+        modal.find('textarea[name="comment"]').val(button.data('comment'));
+
+        // INISIALISASI DATETIMEPICKER TEPAT SAAT MODAL DIBUKA
+        modal.find('.datetimepicker').datetimepicker({
+            format: 'Y-m-d H:i:00',
+            timepicker: true,
+            step: 15,
+            // Opsi ini penting agar kalender muncul di atas modal
+            onShow: function() {
+                this.setOptions({
+                    zIndex: 1056 // z-index modal Bootstrap adalah 1055
+                });
+            }
+        });
+    });
+
+    // Inisialisasi Datepicker untuk form filter
+    $("#start_date, #end_date").datepicker({ dateFormat: 'yy-mm-dd' });
 
     // Logika Sidebar (Delegated)
     $('#close_sidebar_data').click(function() { /* ... */ });
