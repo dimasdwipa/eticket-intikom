@@ -208,14 +208,13 @@ class AgentController extends Controller
         $data2->save();
 
 
+        // Panggil email. Laravel akan otomatis menggunakan driver 'log' di lokal 
+        // dan 'smtp' di production berdasarkan file .env Anda.
         if($request->status=="On Progress"){
-
-            $email=new MailController();
+            $email = new MailController();
             $email->actionticket($data->id,"response");
-
         }elseif($request->status=="Resolved"){
-
-            $email=new MailController();
+            $email = new MailController();
             $email->actionticket($data->id,"resolved");
         }
 
@@ -223,23 +222,30 @@ class AgentController extends Controller
 
         } catch (\Throwable $th) {
             DB::rollBack();
-            return back()->with('error',$th);
-        }
+            // Jika terjadi error, kirim response JSON yang sesuai
+            if ($request->ajax()) {
+                // Berikan pesan error yang lebih detail saat development
+                return response()->json(['error' => 'An error occurred: ' . $th->getMessage()], 500);
+            }
+            return back()->with('error', $th->getMessage());
+            }
 
-        if ($request->ajax()) {
-        return response()->json(['success' => 'Ticket #' . $data->code . ' has been responded to.']);
-        }
-        return back()->with('success', 'Ticket #' . $data->code . ' have been responded to with you, Enjoy your work !');
+                // Siapkan pesan sukses
+                $message = 'Action completed successfully for Ticket #'.$data->code;
+                if($request->status=="On Progress"){
+                    $message = 'Ticket #'.$data->code.' have been responded to with you, Enjoy your work !';
+                }elseif($request->status=="Resolved"){
+                    $message = 'Ticket #'.$data->code.' has been resolved with you !';
+                }
 
+                // Kirim response JSON jika ini adalah request AJAX
+                if ($request->ajax()) {
+                    return response()->json(['success' => $message]);
+                }
 
-        if($request->status=="On Progress"){
-            return back()->with('success','Ticket #'.$data->code.' have been responded to with you, Enjoy your work !');
-        }elseif($request->status=="Resolved"){
-            return back()->with('success','Ticket #'.$data->code.' has been resolved with you !');
-        }else{
-            return back()->with('success','Ticket #'.$data->code.' reworked with you, Enjoy your work !');
-        }
-    }
+                // Fallback untuk non-AJAX
+                return back()->with('success', $message);
+            }
 
 
     public function request(Request $request){
