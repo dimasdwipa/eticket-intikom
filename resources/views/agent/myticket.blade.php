@@ -291,7 +291,6 @@
                 <input type="hidden" name="id" id="code_ticket">
                 <div class="modal-body">
                     <div class="prablem p4" id="problem_ticket">
-
                     </div>
                 </div>
             </div>
@@ -419,7 +418,7 @@
                 <div class="modal-body">
 
                     <div class="prablem p4" id="problem_ticket">
-                        <form action="{{ route('agent.request') }}" method="post">
+                        <form id="otherForm" action="{{ route('agent.request') }}" method="post">
                             @csrf
                             <div class="input-group input-group-static mb-4">
                                 <label class="text-dark">#Ticket</label>
@@ -473,7 +472,7 @@
                 <div class="modal-body">
 
                     <div class="prablem p4" id="problem_ticket">
-                        <form action="{{ route('agent.request') }}" method="post">
+                        <form id="otherForm" action="{{ route('agent.request') }}" method="post">
                             @csrf
                             <div class="input-group input-group-static mb-4">
                                 <label class="text-dark">#Ticket</label>
@@ -513,7 +512,9 @@
 {{-- Ini adalah kode JavaScript final yang sudah disesuaikan untuk halaman my-ticket --}}
 <script>
 $(document).ready(function() {
-    // 1. Inisialisasi DataTable (tidak diubah)
+    // =================================================================
+    // 1. Inisialisasi DataTable
+    // =================================================================
     var table = $('.tableku').DataTable({
         "processing": true,
         "serverSide": true,
@@ -527,24 +528,23 @@ $(document).ready(function() {
                 d.keyword = $('#keyword').val();
             }
         },
-        // Pastikan 'render' untuk kolom Action sudah benar menambahkan data-* atribut
         "columns": [
             { 
                 "data": null, "orderable": false, "searchable": false, 
                 "render": function(data, type, row) { 
                     let buttons = '';
-                    // Penting: Tambahkan data-bs-toggle dan data-bs-target di sini!
-                    if (row.status === 'Awaiting Response') {
+                    let status = row.status ? row.status.toLowerCase() : '';
+                    if (status === 'awaiting response') {
                         buttons += `<button type="button" class="btn btn-sm btn-success m-1 Response" data-bs-toggle="modal" data-bs-target="#Response" data-id="${row.id}" data-code="${row.code}" data-title="Response" data-status="On Progress" data-comment="I will do this task now">Response</button>`;
-                    } else if (row.status === 'On Progress') {
+                    } else if (status === 'on progress') {
                         buttons += `<button type="button" class="btn btn-sm btn-warning m-1 Other" data-bs-toggle="modal" data-bs-target="#Other" data-id="${row.id}" data-code="${row.code}" data-title="Request Repair" data-status="Request Repair">Request Repair</button> `;
                         buttons += `<button type="button" class="btn btn-sm btn-danger m-1 Other" data-bs-toggle="modal" data-bs-target="#Other" data-id="${row.id}" data-code="${row.code}" data-title="Request Pending" data-status="Request Pending">Request Pending</button> `;
                         buttons += `<button type="button" class="btn btn-sm btn-success m-1 Response" data-bs-toggle="modal" data-bs-target="#Response" data-id="${row.id}" data-code="${row.code}" data-title="Resolved Ticket" data-status="Resolved">Resolved</button>`;
-                    } else if (row.status === 'Repairing') {
+                    } else if (status === 'repairing') {
                         buttons += `<button type="button" class="btn btn-sm btn-success m-1 Response" data-bs-toggle="modal" data-bs-target="#Response" data-id="${row.id}" data-code="${row.code}" data-title="End Repair" data-status="End Repair" data-comment="I will continue this ticket now">End Repair</button>`;
-                    } else if (row.status === 'Pending') {
+                    } else if (status === 'pending') {
                         buttons += `<button type="button" class="btn btn-sm btn-success m-1 Response" data-bs-toggle="modal" data-bs-target="#Response" data-id="${row.id}" data-code="${row.code}" data-title="End Pending" data-status="End Pending" data-comment="I will continue this ticket now">End Pending</button>`;
-                    } else if (row.status === 'Resolved') {
+                    } else if (status === 'resolved') {
                         buttons += `<button type="button" class="btn btn-sm btn-info m-1 Closed" data-bs-toggle="modal" data-bs-target="#Closed" data-id="${row.id}" data-code="${row.code}" data-title="Request Closed" data-status="Request Close">Request Closed</button>`;
                     }
                     return `<div class="btn-group" role="group">${buttons}</div>`;
@@ -569,9 +569,9 @@ $(document).ready(function() {
             { "data": "sla_resolved", "defaultContent": "-" },
             { "data": "sla_close", "defaultContent": "-" },
             { "data": "rating", "defaultContent": "-" },
-            { "data": "files", "orderable": false, "searchable": false, "render": function(data) { 
-                if(data) {
-                    let fileUrl = '/storage/files/tickets/' + data;
+            { "data": "files", "orderable": false, "searchable": false, "render": function(data, type, row) { 
+                if(row.files) {
+                    let fileUrl = '/storage/files/tickets/' + row.files;
                     return `<div class="btn-group btn-group-sm"><a href="${fileUrl}" target="_blank" class="btn btn-sm btn-outline-info">Show</a><a href="${fileUrl}" download class="btn btn-sm btn-outline-success">Download</a></div>`;
                 }
                 return '-';
@@ -580,7 +580,7 @@ $(document).ready(function() {
         ],
         dom:  '<"row mx-2"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6 d-flex justify-content-end"Bf>>t<"row mx-2"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-7"p>>',
         buttons: [
-            { text: 'Filter', className: 'btn btn-sm btn-white btn-outline-primary shadow rounded me-2 filter-btn' },
+            { text: 'Filter', className: 'btn btn-sm btn-white btn-outline-primary shadow rounded me-2', action: function () { $('#exampleModal').modal('show'); } },
             'excelHtml5', 'csvHtml5', 'pdfHtml5', 'print'
         ],
         language: { 'search': '' },
@@ -589,93 +589,89 @@ $(document).ready(function() {
     });
 
     // =================================================================
-    // 3. Hubungkan Semua Form ke DataTable & AJAX
+    // 2. FUNGSI UMUM UNTUK SUBMIT FORM VIA AJAX
     // =================================================================
-    // Tombol Filter utama
-    $('.filter-btn').on('click', function() {
-        $('#exampleModal').modal('show');
-    });
+    function submitFormViaAjax(form, datatable) {
+        var modal = form.closest('.modal');
+        $.ajax({
+            type: "POST",
+            url: form.attr('action'),
+            data: form.serialize(),
+            success: function(response) {
+                modal.modal('hide');
+                form[0].reset();
+                datatable.ajax.reload(null, false);
+            },
+            error: function(xhr) {
+                var errorMsg = 'An error occurred during submission.';
+                if (xhr.responseJSON && xhr.responseJSON.errors) {
+                    errorMsg = Object.values(xhr.responseJSON.errors).map(err => err.join('\n')).join('\n');
+                } else if (xhr.responseJSON && xhr.responseJSON.message) {
+                    errorMsg = xhr.responseJSON.message;
+                }
+                alert(errorMsg);
+            }
+        });
+    }
 
-    // Form Filter
+    // =================================================================
+    // 3. Hubungkan Semua Form ke Fungsi AJAX
+    // =================================================================
     $('#exampleModal form').on('submit', function(e) {
         e.preventDefault();
         table.ajax.reload();
         $('#exampleModal').modal('hide');
     });
 
-    // Form Response
-    $('#responseForm').on('submit', function(e) { // <-- Pastikan ID form-mu adalah 'responseForm'
-        e.preventDefault();
-        var form = $(this);
-        $.ajax({
-            type: "POST",
-            url: form.attr('action'),
-            data: form.serialize(),
-            success: function(response) {
-                $('#Response').modal('hide');
-                table.ajax.reload(null, false); // INI AKAN BERFUNGSI SEKARANG
-                // alert(response.success); // Nonaktifkan alert agar tidak mengganggu
-            },
-            error: function(xhr) {
-                alert('An error occurred during submission.');
-            }
-        });
-    });
-
-    $('form#otherForm').on('submit', function(e) {
+    // Gunakan event delegation untuk semua form di dalam modal
+    $(document).on('submit', '#responseForm, #otherForm, #closedForm, #extendSLAForm', function(e) {
         e.preventDefault();
         submitFormViaAjax($(this), table);
     });
 
-    // (Tambahkan event handler AJAX serupa untuk form 'Other' dan 'Closed' jika perlu)
-
-    $(document).on('show.bs.modal', '#Detail', function(event) {
+    // =================================================================
+    // 4. PERBAIKAN: Event Handler SPESIFIK untuk Setiap Modal
+    // =================================================================
+    $('#Detail').on('show.bs.modal', function(event) {
         var button = $(event.relatedTarget);
         $(this).find('#problem_ticket').text(button.data('problem'));
     });
 
-    $(document).on('show.bs.modal', '#Response, #Closed, #ExtendSLA', function(event) {
+    $('#Response, #Closed, #ExtendSLA').on('show.bs.modal', function(event) {
         var button = $(event.relatedTarget);
         var modal = $(this);
-        modal.find('input[name="id"]').val(button.data('id'));
-        modal.find('input[name="code"]').val(button.data('code'));
+        var form = modal.find('form');
+        form.find('input[name="id"]').val(button.data('id'));
+        form.find('input[name="code"]').val(button.data('code'));
         modal.find('#title').text(button.data('title'));
-        modal.find('input[name="status"]').val(button.data('status'));
-        modal.find('textarea[name="comment"]').val(button.data('comment'));
+        form.find('input[name="status"]').val(button.data('status'));
+        form.find('textarea[name="comment"]').val(button.data('comment'));
     });
 
     // --- Handler Khusus untuk Modal "Request Pending" (`#Other`) ---
-    $(document).on('show.bs.modal', '#Other', function(event) {
+    $('#Other').on('show.bs.modal', function(event) {
         var button = $(event.relatedTarget);
         var modal = $(this);
+        var form = modal.find('form');
 
-        // Isi data modal seperti biasa
-        modal.find('input[name="id"]').val(button.data('id'));
-        modal.find('input[name="code"]').val(button.data('code'));
+        // Isi data modal dengan selector ID yang tepat
+        form.find('#idresponse').val(button.data('id'));
+        form.find('#coderesponse').val(button.data('code'));
         modal.find('#title').text(button.data('title'));
-        modal.find('input[name="status"]').val(button.data('status'));
-        modal.find('textarea[name="comment"]').val(button.data('comment'));
+        form.find('#status').val(button.data('status'));
+        form.find('#comment').val(button.data('comment'));
 
-        // INISIALISASI DATETIMEPICKER TEPAT SAAT MODAL DIBUKA
+        // Inisialisasi datetimepicker
         modal.find('.datetimepicker').datetimepicker({
             format: 'Y-m-d H:i:00',
             timepicker: true,
             step: 15,
-            // Opsi ini penting agar kalender muncul di atas modal
-            onShow: function() {
-                this.setOptions({
-                    zIndex: 1056 // z-index modal Bootstrap adalah 1055
-                });
-            }
+            onShow: function() { this.setOptions({ zIndex: 1056 }); }
         });
     });
 
     // Inisialisasi Datepicker untuk form filter
     $("#start_date, #end_date").datepicker({ dateFormat: 'yy-mm-dd' });
-
-    // Logika Sidebar (Delegated)
-    $('#close_sidebar_data').click(function() { /* ... */ });
-    $('.tableku tbody').on('click', 'tr', function(event) { /* ... */ });
 });
 </script>
 @endpush
