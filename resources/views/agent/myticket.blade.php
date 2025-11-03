@@ -537,7 +537,7 @@ $(document).ready(function() {
                     if (status === 'awaiting response') {
                         buttons += `<button type="button" class="btn btn-sm btn-success m-1 Response" data-bs-toggle="modal" data-bs-target="#Response" data-id="${row.id}" data-code="${row.code}" data-title="Response" data-status="On Progress" data-comment="I will do this task now">Response</button>`;
                     } else if (status === 'on progress') {
-                        buttons += `<button type="button" class="btn btn-sm btn-warning m-1 Other" data-bs-toggle="modal" data-bs-target="#Other" data-id="${row.id}" data-code="${row.code}" data-title="Request Repair" data-status="Request Repair">Request Repair</button> `;
+                        // buttons += `<button type="button" class="btn btn-sm btn-warning m-1 Other" data-bs-toggle="modal" data-bs-target="#Other" data-id="${row.id}" data-code="${row.code}" data-title="Request Repair" data-status="Request Repair">Request Repair</button> `;
                         buttons += `<button type="button" class="btn btn-sm btn-danger m-1 Other" data-bs-toggle="modal" data-bs-target="#Other" data-id="${row.id}" data-code="${row.code}" data-title="Request Pending" data-status="Request Pending">Request Pending</button> `;
                         buttons += `<button type="button" class="btn btn-sm btn-success m-1 Response" data-bs-toggle="modal" data-bs-target="#Response" data-id="${row.id}" data-code="${row.code}" data-title="Resolved Ticket" data-status="Resolved">Resolved</button>`;
                     } else if (status === 'repairing') {
