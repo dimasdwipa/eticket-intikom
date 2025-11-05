@@ -305,7 +305,12 @@
                                                 <button type="button"
                                                     class="btn btn-sm btn-warning m-0 p-1 Update-SubCategory"
                                                     style="width: 5rem">Edit</button>
-                                                    <button type="button" class="btn btn-sm btn-danger m-0 p-1 Delete-SubCategory" style="width: 5rem" data-id="{{ $item->id }}">
+                                                <button type="button" 
+                                                        class="btn btn-sm btn-danger m-0 p-1 Delete-SubCategory" 
+                                                        style="width: 5rem" 
+                                                        data-id="{{ $item->id }}"
+                                                        data-bs-toggle="modal" 
+                                                        data-bs-target="#deleteConfirmModal">
                                                     Delete
                                                 </button>
                                             </td>
@@ -359,6 +364,29 @@
     </form>
 @endsection
 @push('modal')
+    {{-- Modal Konfirmasi Delete --}}
+    <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header py-2 bg-danger">
+                        <h5 class="modal-title text-white" id="deleteModalLabel">Confirm Deletion</h5>
+                        <button type="button" class="btn btn-outline m-0 p-1" data-bs-dismiss="modal" aria-label="Close">
+                            <span class="text-white h7"><i class="fas fa-external-link-alt"></i></span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <p class="text-danger"><strong>Anda Yakin Ingin Menhapus Sub Kategori Ini?</strong></p>
+                    </div>
+                    <div class="modal-footer py-2 bg-gray-200">
+                        <button type="button" class="btn btn-outline-secondary btn-sm m-0" data-bs-dismiss="modal">Cancel</button>
+                        {{-- Tombol ini akan memicu penghapusan --}}
+                        <button type="button" id="confirmDeleteButton" class="btn btn-outline-danger btn-sm m-0">Delete</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {{-- Modal Konfirmasi Delete --}}
+
     <!-- location -->
 
 
@@ -816,37 +844,42 @@
                 $('#FormActionCategory').submit();
 
             });
-            $('table.table-subcategory').on('click', 'Button', function(e) {
-
-                var row = $(this).closest('tr'),
-                    dataID = $('.dataID', row),
-                    sub_kategori = $('.sub_kategori', row);
-                extend_ticket_SLA_default = $('.extend_ticket_SLA_default', row);
-                extend_response_SLA_default = $('.extend_response_SLA_default', row);
-                send_assignment_default = $('.send_assignment_default', row);
-                agent_id = $('.agent_id', row);
-                supervisor_id = $('.supervisor_id', row);
-
-                $('#sub_kategoriId').val(dataID.val());
-                $('#agent_id').val(agent_id.val());
-                $('#supervisor_id').val(supervisor_id.val());
-                $('#sub_kategori').val(sub_kategori.val());
-                $('#extend_ticket_SLA_default').val(extend_ticket_SLA_default.val());
-                $('#extend_response_SLA_default').val(extend_response_SLA_default.val());
-                $('#send_assignment_default').val(send_assignment_default.val());
-                $('#FormActionSubCategory').submit();
-
-            });
+            $('table.table-subcategory').on('click', '.Update-SubCategory', function(e) {
+            var row = $(this).closest('tr');
+            var dataID = row.find('.dataID').val();
+            
+            // Menggunakan standar 'k' (sub_kategori)
+            $('#sub_kategoriId').val(dataID);
+            $('#agent_id').val(row.find('.agent_id').val());
+            $('#supervisor_id').val(row.find('.supervisor_id').val());
+            $('#sub_kategori').val(row.find('.sub_kategori').val());
+            $('#extend_ticket_SLA_default').val(row.find('.extend_ticket_SLA_default').val());
+            $('#extend_response_SLA_default').val(row.find('.extend_response_SLA_default').val());
+            $('#send_assignment_default').val(row.find('.send_assignment_default').val());
+            
+            // Set action form dan submit
+            var form = $('#FormActionSubCategory');
+            var newAction = form.attr('action').replace('/0', '/' + dataID);
+            form.attr('action', newAction);
+            form.submit();
+        });
             // TAMBAHKAN EVENT LISTENER BARU UNTUK "Delete"
-            $('table.table-subcategory').on('click', '.Delete-SubCategory', function(e) {
-                var button = $(this);
-                var subCategoryId = button.data('id');
+            var subCategoryIdToDelete = null;
 
-                // Tampilkan konfirmasi
-                if (confirm('Are you sure you want to delete this sub-category? This action cannot be undone.')) {
+            // 1. Saat modal konfirmasi hapus DIBUKA:
+            $('#deleteConfirmModal').on('show.bs.modal', function (event) {
+                // Tombol yang memicu modal
+                var button = $(event.relatedTarget); 
+                // Ambil ID dari data-id tombol dan simpan di variabel
+                subCategoryIdToDelete = button.data('id'); 
+            });
+
+            // 2. Saat tombol "Delete" di dalam modal DIKLIK:
+            $('#confirmDeleteButton').on('click', function(e) {
+                if (subCategoryIdToDelete) {
                     var form = $('#FormActionDeleteSubCategory');
                     // Buat action URL yang benar
-                    var actionUrl = "{{ route('sub-category.destroy', ':id') }}".replace(':id', subCategoryId);
+                    var actionUrl = "{{ route('sub-category.destroy', ':id') }}".replace(':id', subCategoryIdToDelete);
                     
                     form.attr('action', actionUrl);
                     form.submit();
