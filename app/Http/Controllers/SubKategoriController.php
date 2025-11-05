@@ -7,6 +7,8 @@ use App\Http\Requests\StoreSubKategoriRequest;
 use App\Http\Requests\UpdateSubKategoriRequest;
 use Illuminate\Http\Request;
 use App\Http\Controllers\MailController;
+use App\Models\Ticket;
+use Illuminate\Support\Facades\DB;
 
 class SubKategoriController extends Controller
 {
@@ -119,8 +121,58 @@ class SubKategoriController extends Controller
      * @param  \App\Models\SubKategori  $subKategori
      * @return \Illuminate\Http\Response
      */
-    public function destroy(SubKategori $subKategori)
+    public function destroy($id)
     {
-        //
+        // ======================================================
+        // VVV DI SINI PERBAIKAN UTAMANYA VVV
+        // ======================================================
+
+        // 1. Ambil modelnya secara manual, TANPA global scope
+        $subKategori = SubKategori::withoutGlobalScopes()->find($id);
+
+        // 2. Cek apakah datanya ada
+        if (!$subKategori) {
+             return back()->with('error', 'Data not found.');
+        }
+
+        // 3. Safety check (menggunakan 'g' sesuai migrasi)
+        $isUsedInTickets = Ticket::withoutGlobalScopes()
+                                 ->where('katagori_id', $subKategori->katagori_id)
+                                 ->where('sub_katagori_id', $subKategori->id)
+                                 ->exists();
+
+        if ($isUsedInTickets) {
+            return back()->with('error', 'Tidak Bisa Menghapus Sub Category Karena Sub Category Digunakan di Ticket');
+        }
+
+        DB::beginTransaction();
+        try {
+            
+            // 4. Hapus data menggunakan Query Builder, menargetkan ID secara langsung
+            $deletedRows = DB::table('sub_kategoris')->where('id', $id)->delete();
+
+            if ($deletedRows == 0) {
+                 // Jika masih 0, berarti ada masalah di level database
+                 throw new \Exception('Data could not be deleted from the database.');
+            }
+
+            DB::commit();
+            return back()->with('success', 'Sub category deleted successfully.');
+
+        } catch (\Illuminate\Database\QueryException $e) {
+            // Tangkap error spesifik dari database (misal: foreign key)
+            DB::rollBack();
+            if ($e->errorInfo[1] == 1451) {
+                return back()->with('error', 'Cannot delete: A database constraint failed (foreign key).');
+            }
+            return back()->with('error', 'Database error: ' . $e->getMessage());
+        } catch (\Throwable $th) {
+            // Tangkap error lainnya
+            DB::rollBack();
+            return back()->with('error', 'An error occurred: ' . $th->getMessage());
+        }
+        // ======================================================
+        // ^^^ AKHIR PERBAIKAN ^^^
+        // ======================================================
     }
 }

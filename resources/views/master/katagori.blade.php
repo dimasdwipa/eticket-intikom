@@ -305,6 +305,9 @@
                                                 <button type="button"
                                                     class="btn btn-sm btn-warning m-0 p-1 Update-SubCategory"
                                                     style="width: 5rem">Edit</button>
+                                                    <button type="button" class="btn btn-sm btn-danger m-0 p-1 Delete-SubCategory" style="width: 5rem" data-id="{{ $item->id }}">
+                                                    Delete
+                                                </button>
                                             </td>
                                         </tr>
                                     @endforeach
@@ -349,6 +352,10 @@
         <input type="text" name="agent_id" id="agent_id">
         <input type="text" name="supervisor_id" id="supervisor_id">
         <input type="text" name="send_assignment_default" id="send_assignment_default">
+    </form>
+    <form action="" method="POST" id="FormActionDeleteSubCategory" style="display: none;">
+        @csrf
+        @method('DELETE')
     </form>
 @endsection
 @push('modal')
@@ -829,6 +836,21 @@
                 $('#send_assignment_default').val(send_assignment_default.val());
                 $('#FormActionSubCategory').submit();
 
+            });
+            // TAMBAHKAN EVENT LISTENER BARU UNTUK "Delete"
+            $('table.table-subcategory').on('click', '.Delete-SubCategory', function(e) {
+                var button = $(this);
+                var subCategoryId = button.data('id');
+
+                // Tampilkan konfirmasi
+                if (confirm('Are you sure you want to delete this sub-category? This action cannot be undone.')) {
+                    var form = $('#FormActionDeleteSubCategory');
+                    // Buat action URL yang benar
+                    var actionUrl = "{{ route('sub-category.destroy', ':id') }}".replace(':id', subCategoryId);
+                    
+                    form.attr('action', actionUrl);
+                    form.submit();
+                }
             });
         });
     </script>
